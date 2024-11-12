@@ -4,7 +4,7 @@ const subscriptionSchema = new mongoose.Schema({
     customerId: {
         type: String,
         required: true,
-        index: true,
+
     },
     productId: {
         type: String,
@@ -17,7 +17,7 @@ const subscriptionSchema = new mongoose.Schema({
     subscriptionId: {
         type: String,
         required: true,
-        unique: true,
+       
     },
     planName: {
         type: String,

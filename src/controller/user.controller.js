@@ -5,7 +5,8 @@ const { createTokenUser } = require('../middleware/validate');
 const { validationErrorResponse, successResponse } = require('../utility/response');
 
 
-const validator = require('validator')
+const validator = require('validator');
+const subscriptionModel = require('../models/subscription.model');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 
@@ -14,60 +15,65 @@ function isValidEmail(email) {
 }
 
 async function HandleRegister(req, res) {
-    const { fullName, emailId, password,countryCode , contactNumber } = req.body;
+    const { fullName, emailId, password, countryCode, contactNumber } = req.body;
 
-    console.log({ fullName, emailId, password,countryCode ,contactNumber});
+    console.log({ fullName, emailId, password, countryCode, contactNumber });
 
     try {
+        // Validate email format
         if (!isValidEmail(emailId)) {
             return validationErrorResponse(res, "error", "Enter a valid email", 409);
         }
 
-
+        // Validate required fields
         if (!fullName || !emailId || !password || !countryCode || !contactNumber) {
             return validationErrorResponse(res, "error", "Enter fullName, email Id, password, and role", 409);
         }
 
-
-        const checkUser = await User.findOne({ email:emailId });
-        if (checkUser) {
-            let error = "Already Registered";
-            let message = 'You already have an account. Please login';
-            return validationErrorResponse(res, error, message, 409);
+        // Check if the user already exists
+        const existingUser = await User.findOne({ email: emailId });
+        if (existingUser) {
+            // Check if the user already has a Stripe customer ID
+            if (existingUser.custmorStripeId) {
+                return validationErrorResponse(res, "error", "User already registered with a Stripe account", 409);
+            } else {
+                let error = "Already Registered";
+                let message = 'You already have an account. Please login';
+                return validationErrorResponse(res, error, message, 409);
+            }
         }
 
-
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-
-        const registeredUser = new User({
+        // Create new user
+        const newUser = new User({
             FullName: fullName,
-            email:emailId,
+            email: emailId,
             password: hashedPassword,
             contactNumber,
             countryCode
         });
-        await registeredUser.save();
 
-
+        // Create Stripe customer
         const stripeCustomer = await stripe.customers.create({
             email: emailId,
             name: fullName,
-
         });
 
+        // Attach Stripe customer ID to user record and save user
+        newUser.custmorStripeId = stripeCustomer.id;
+        await newUser.save();
 
-        registeredUser.custmorStripeId = stripeCustomer.id;
-        await registeredUser.save();
-
-
-        return successResponse(res, registeredUser, "Registration successful", 200);
+        // Respond with success message
+        return successResponse(res, newUser, "Registration successful", 200);
 
     } catch (error) {
         console.error("Error during registration:", error);
-        return validationErrorResponse(res,error,'Internal Server Error'  , 500);
+        return validationErrorResponse(res, error, 'Internal Server Error', 500);
     }
 }
+
 async function HandleLogin(req, res) {
     const { email, password } = req.body;
     try {
@@ -114,21 +120,49 @@ async function HandleLogin(req, res) {
 
 async function HandleGetDetail(req,res) {
     try {
-        console.log(req.user);
         const user = await User.findById(req.user._id);
         if (!user) {
-            validationErrorResponse(res,"error","User Do not Register",400)
+            return validationErrorResponse(res, "error", "User not registered", 400);
         }
-        const newData = {
-            fullName:user.FullName,
-            emailId:user.email,
-            contactNumber:`${user.countryCode} ${user.contactNumber}`,
-        }
-        return successResponse(res,newData,"User Detail",200)
+
         
+         
+         const subscriptions = await stripe.subscriptions.list({
+            customer: req.user.customerId,
+            status: 'active',
+            limit: 1
+        });
+
+        const activeSubscription = subscriptions.data[0];
+        if (!activeSubscription) {
+            return validationErrorResponse(res, "error", "No active subscription found", 404);
+        }
+
+
+       console.log(activeSubscription);
+       
+        const responseData = {
+            fullName: user.FullName,
+            emailId: user.email,
+            contactNumber: `${user.countryCode} ${user.contactNumber}`,
+            activePlan: {
+                planName: activeSubscription.planName,
+                amount: activeSubscription.amount / 100, 
+                currency: activeSubscription.currency,
+                interval: activeSubscription.interval,
+                intervalCount: activeSubscription.intervalCount,
+                startDate: activeSubscription.startDate,
+                endDate: activeSubscription.endDate
+            }
+        };
+
+        return successResponse(res, responseData, "User and Subscription Details", 200);
+
     } catch (error) {
-        return validationErrorResponse(res,error,'Internal Server Error'  , 500);
+        console.error('Error retrieving user details:', error);
+        return validationErrorResponse(res, error, 'Internal Server Error', 500);
     }
+
 }
 
 

@@ -16,7 +16,7 @@ app.use(cors({
     origin: ['http://localhost:3000', 'https://subscription-6d1n.onrender.com']
 }));
 
-const port = process.env.port
+const port = process.env.PORT || 2132; 
 
 app.use(cookieParser())
 app.use(express.json())
