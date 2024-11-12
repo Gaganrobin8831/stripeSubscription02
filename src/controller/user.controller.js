@@ -14,7 +14,7 @@ function isValidEmail(email) {
 }
 
 async function HandleRegister(req, res) {
-    const { fullName, emailId, password , contactNumber } = req.body;
+    const { fullName, emailId, password,countryCode , contactNumber } = req.body;
 
     console.log({ fullName, emailId, password,countryCode ,contactNumber});
 
@@ -65,7 +65,7 @@ async function HandleRegister(req, res) {
 
     } catch (error) {
         console.error("Error during registration:", error);
-        return validationErrorResponse(res, error, "Something went wrong", 400);
+        return validationErrorResponse(res,error,'Internal Server Error'  , 500);
     }
 }
 async function HandleLogin(req, res) {
@@ -108,15 +108,33 @@ async function HandleLogin(req, res) {
         return successResponse(res, data, "Login Success", 200)
     } catch (error) {
         console.log(error);
-        return validationErrorResponse(res, error, "Something Wrong", 400)
+        return validationErrorResponse(res,error,'Internal Server Error'  , 500);
+    }
+}
+
+async function HandleGetDetail(req,res) {
+    try {
+        console.log(req.user);
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            validationErrorResponse(res,"error","User Do not Register",400)
+        }
+        const newData = {
+            fullName:user.FullName,
+            emailId:user.email,
+            contactNumber:`${user.countryCode} ${user.contactNumber}`,
+        }
+        return successResponse(res,newData,"User Detail",200)
+        
+    } catch (error) {
+        return validationErrorResponse(res,error,'Internal Server Error'  , 500);
     }
 }
 
 
-
-
 module.exports = {
     HandleRegister,
-    HandleLogin
+    HandleLogin,
+    HandleGetDetail
 
 }
