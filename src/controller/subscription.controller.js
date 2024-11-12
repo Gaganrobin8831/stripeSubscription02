@@ -2,8 +2,6 @@ const { validationErrorResponse } = require('../utility/response');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
-const Subscription = require('../models/subscription.model');
-
 async function HandleCreateSubscription(req, res) {
     const { planName, amount } = req.body;
     const customerId = req.user?.customerId;
@@ -62,7 +60,7 @@ async function HandleCreateSubscription(req, res) {
         // });
 
         // await subscription.save();
-        
+
         // Send the session URL for checkout
         res.json({ url: session.url });
     } catch (error) {

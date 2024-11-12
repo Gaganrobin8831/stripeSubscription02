@@ -75,18 +75,18 @@ async function HandleRegister(req, res) {
 }
 
 async function HandleLogin(req, res) {
-    const { email, password } = req.body;
+    const { emailId, password } = req.body;
     try {
-        if (isValidEmail(email) == false) {
+        if (isValidEmail(emailId) == false) {
             return validationErrorResponse(res, "error", "Enter Valid Email", 409)
         }
 
-        if (!email || !password) {
+        if (!emailId || !password) {
             return validationErrorResponse(res, "error", "Enter email passeord ", 409)
         }
         let token
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email:emailId });
         if (!user) {
             return validationErrorResponse(res, error, 'Invalid email or password', 400)
         }
@@ -106,7 +106,7 @@ async function HandleLogin(req, res) {
 
         res.cookie('authToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
         let data = {
-            email,
+            emailId,
             password,
             token
         }
