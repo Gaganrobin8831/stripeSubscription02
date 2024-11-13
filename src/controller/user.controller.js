@@ -118,36 +118,80 @@ async function HandleLogin(req, res) {
     }
 }
 
-async function HandleGetDetail(req,res) {
-    try {
-        const user = await User.findById(req.user._id);
-        if (!user) {
-            return validationErrorResponse(res, "error", "User not registered", 400);
-        }
+// async function HandleGetDetail(req,res) {
+//     try {
+//         const user = await User.findById(req.user._id);
+//         if (!user) {
+//             return validationErrorResponse(res, "error", "User not registered", 400);
+//         }
 
         
          
-         const subscriptions = await stripe.subscriptions.list({
-            customer: req.user.customerId,
+//          const subscriptions = await stripe.subscriptions.list({
+//             customer: req.user.customerId,
+//             status: 'active',
+//             limit: 1
+//         });
+
+//         const activeSubscription = subscriptions.data[0];
+//         if (!activeSubscription) {
+//             return validationErrorResponse(res, "error", "No active subscription found", 404);
+//         }
+
+
+//        console.log(activeSubscription);
+       
+//         const responseData = {
+//             fullName: user.FullName,
+//             emailId: user.email,
+//             contactNumber: `${user.countryCode} ${user.contactNumber}`,
+//             activePlan: {
+//                 planName: activeSubscription.planName,
+//                 amount: activeSubscription.amount / 100, 
+//                 currency: activeSubscription.currency,
+//                 interval: activeSubscription.interval,
+//                 intervalCount: activeSubscription.intervalCount,
+//                 startDate: activeSubscription.startDate,
+//                 endDate: activeSubscription.endDate
+//             }
+//         };
+
+//         return successResponse(res, responseData, "User and Subscription Details", 200);
+
+//     } catch (error) {
+//         console.error('Error retrieving user details:', error);
+//         return validationErrorResponse(res, error, 'Internal Server Error', 500);
+//     }
+
+// }
+
+async function HandleGetDetail(req, res) {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return validationErrorResponse(res, "error", "Unauthorized", 401);
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded._id);
+        if (!user) {
+            return validationErrorResponse(res, "error", "User not registered", 400);
+        }
+        const subscriptions = await stripe.subscriptions.list({
+            customer: user.customerId,
             status: 'active',
             limit: 1
         });
-
         const activeSubscription = subscriptions.data[0];
         if (!activeSubscription) {
             return validationErrorResponse(res, "error", "No active subscription found", 404);
         }
-
-
-       console.log(activeSubscription);
-       
         const responseData = {
             fullName: user.FullName,
             emailId: user.email,
             contactNumber: `${user.countryCode} ${user.contactNumber}`,
             activePlan: {
                 planName: activeSubscription.planName,
-                amount: activeSubscription.amount / 100, 
+                amount: activeSubscription.amount / 100,
                 currency: activeSubscription.currency,
                 interval: activeSubscription.interval,
                 intervalCount: activeSubscription.intervalCount,
@@ -155,14 +199,11 @@ async function HandleGetDetail(req,res) {
                 endDate: activeSubscription.endDate
             }
         };
-
         return successResponse(res, responseData, "User and Subscription Details", 200);
-
     } catch (error) {
         console.error('Error retrieving user details:', error);
         return validationErrorResponse(res, error, 'Internal Server Error', 500);
     }
-
 }
 
 async function HandleLogout(req,res) {
