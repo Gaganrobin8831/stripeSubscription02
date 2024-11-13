@@ -238,7 +238,7 @@ async function HandleLogout(req,res) {
         if (!token) {
             return validationErrorResponse(res, "error", "Unauthorized", 401);
         }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.secret);
         const user = await User.findById(decoded._id);
         if (!user) {
             return validationErrorResponse(res, "error", "User not found", 404);
