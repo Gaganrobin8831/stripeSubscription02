@@ -167,12 +167,19 @@ async function HandleLogin(req, res) {
 
 async function HandleGetDetail(req, res) {
     try {
+         
         const token = req.headers.authorization?.split(' ')[1];
+       
+        
         if (!token) {
             return validationErrorResponse(res, "error", "Unauthorized", 401);
         }
         const decoded = jwt.verify(token, process.env.secret);
+        console.log(decoded._id);
+        
         const user = await User.findById(decoded._id);
+        console.log({user});
+        
         if (!user) {
             return validationErrorResponse(res, "error", "User not registered", 400);
         }

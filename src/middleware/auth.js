@@ -2,7 +2,7 @@ const { validateToken } = require('../middleware/validate');
 const { validationErrorResponse } = require('../utility/response');
 
 function checkAuth(req, res, next) {
-  const token = req.cookies.authToken; 
+  const token = req.headers.authorization?.split(' ')[1];
   console.log(token);
   
   if (!token) {
