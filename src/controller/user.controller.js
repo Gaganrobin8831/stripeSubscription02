@@ -17,7 +17,7 @@ function isValidEmail(email) {
 async function HandleRegister(req, res) {
     const { fullName, emailId, password, countryCode, contactNumber } = req.body;
 
-    console.log({ fullName, emailId, password, countryCode, contactNumber });
+    // console.log({ fullName, emailId, password, countryCode, contactNumber });
 
     try {
         // Validate email format
@@ -262,7 +262,7 @@ async function HandleCustomerUpgrade(req,res) {
             return validationErrorResponse(res, "error", "Unauthorized", 401);
         }
         const decoded = jwt.verify(token, process.env.secret);
-        console.log(decoded.customerId);
+        // console.log(decoded.customerId);
         
     
         
@@ -273,7 +273,7 @@ async function HandleCustomerUpgrade(req,res) {
     // res.send(portalSession.url)
         res.redirect(portalSession.url)
     } catch (error) {
-        console.error('Logout Error:', error);
+        // console.error('Logout Error:', error);
         return validationErrorResponse(res, error, 'Internal Server Error', 500);
     }
 }
