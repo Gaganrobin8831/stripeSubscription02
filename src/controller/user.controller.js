@@ -181,22 +181,25 @@ async function HandleGetDetail(req, res) {
             status: 'active',
             limit: 1
         });
+        let messageForNull
         const activeSubscription = subscriptions.data[0];
         if (!activeSubscription) {
-            return validationErrorResponse(res, "error", "No active subscription found", 200);
+            messageForNull ="No active subscription found"
+          
         }
         const responseData = {
             fullName: user.FullName,
             emailId: user.email,
             contactNumber: `${user.countryCode} ${user.contactNumber}`,
+            messageForNull,
             activePlan: {
-                planName: activeSubscription.planName,
-                amount: activeSubscription.amount / 100,
-                currency: activeSubscription.currency,
-                interval: activeSubscription.interval,
-                intervalCount: activeSubscription.intervalCount,
-                startDate: activeSubscription.startDate,
-                endDate: activeSubscription.endDate
+                planName: activeSubscription?.planName,
+                amount: activeSubscription?.amount / 100,
+                currency: activeSubscription?.currency,
+                interval: activeSubscription?.interval,
+                intervalCount: activeSubscription?.intervalCount,
+                startDate: activeSubscription?.startDate,
+                endDate: activeSubscription?.endDate
             }
         };
         return successResponse(res, responseData, "User and Subscription Details", 200);
