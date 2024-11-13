@@ -183,7 +183,7 @@ async function HandleGetDetail(req, res) {
         });
         const activeSubscription = subscriptions.data[0];
         if (!activeSubscription) {
-            return validationErrorResponse(res, "error", "No active subscription found", 404);
+            return validationErrorResponse(res, "error", "No active subscription found", 200);
         }
         const responseData = {
             fullName: user.FullName,
