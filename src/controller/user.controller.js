@@ -270,8 +270,8 @@ async function HandleCustomerUpgrade(req,res) {
             customer: decoded.customerId,
             return_url: `${process.env.BASE_URL}/`
         })
-    // res.send(portalSession.url)
-        res.redirect(portalSession.url)
+    res.send(portalSession.url)
+        // res.redirect(portalSession.url)
     } catch (error) {
         // console.error('Logout Error:', error);
         return validationErrorResponse(res, error, 'Internal Server Error', 500);
