@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { HandleRegister, HandleLogin, HandleGetDetail } = require('../controller/user.controller');
+const { HandleRegister, HandleLogin, HandleGetDetail,HandleLogout } = require('../controller/user.controller');
 const { checkAuth } = require('../middleware/auth');
 
 
@@ -12,6 +12,7 @@ userrouter.route('/regester').post(HandleRegister)
 
 
 userrouter.route('/Login').post(HandleLogin); 
+userrouter.route('/Logout').post(HandleLogout); 
 
 userrouter.route('/showdata').get(checkAuth,HandleGetDetail)
 

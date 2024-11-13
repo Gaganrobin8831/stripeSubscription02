@@ -107,7 +107,7 @@ async function HandleLogin(req, res) {
         res.cookie('authToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
         let data = {
             emailId,
-            password,
+          
             token
         }
 
@@ -165,10 +165,31 @@ async function HandleGetDetail(req,res) {
 
 }
 
+async function HandleLogout(req,res) {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return validationErrorResponse(res, "error", "Unauthorized", 401);
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded._id);
+        if (!user) {
+            return validationErrorResponse(res, "error", "User not found", 404);
+        }
+
+        user.token = null;
+        await user.save();
+        return successResponse(res, {}, "Logout successful", 200);
+    } catch (error) {
+        console.error('Logout Error:', error);
+        return validationErrorResponse(res, error, 'Internal Server Error', 500);
+    }
+}
 
 module.exports = {
     HandleRegister,
     HandleLogin,
-    HandleGetDetail
+    HandleGetDetail,
+    HandleLogout
 
 }
