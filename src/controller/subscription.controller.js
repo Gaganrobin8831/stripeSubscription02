@@ -102,6 +102,9 @@ async function HandleAddDataOfSubscription(req, res) {
         
         const product = await stripe.products.retrieve(price.product); 
     
+       const userdetailOfSubscription = await subscriptionModel.findOne({customerId})
+
+       if(!userdetailOfSubscription){
        
         const subscriptionData = {
             customerId: req.user.customerId,
@@ -122,9 +125,13 @@ async function HandleAddDataOfSubscription(req, res) {
         };
     
        
+        
         const newSubscription = await subscriptionModel.create(subscriptionData);
+        console.log(newSubscription)
+       }
+        
     
-        console.log(newSubscription);
+        
     
         return res.status(201).json({
             status: "success",
