@@ -41,8 +41,8 @@ console.log({ planName, amount })
             mode: 'subscription',
             customer: customerId,
             line_items: [{ price: price.id, quantity: 1 }],
-            success_url: `http://localhost:3000/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `http://localhost:3000/payment-failed`,
+            success_url: `https://subscription-5k7x.onrender.com/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://subscription-5k7x.onrender.com/payment-failed`,
         });
 // console.log(session);
 
