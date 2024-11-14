@@ -275,11 +275,10 @@ async function HandleGetDetail(req, res) {
         
         if (dbActiveSubscription) {
             const activePlanFromStripe = activeSubscription.items.data[0].plan;
-            const planNameFromStripe = productDetails.name;
+            
             const amountFromStripe = activePlanFromStripe.amount / 100; 
 
             if (
-                dbActiveSubscription.planName !== planNameFromStripe ||
                 dbActiveSubscription.amount !== amountFromStripe
             ) {
                 await subscriptionModel.updateOne(
