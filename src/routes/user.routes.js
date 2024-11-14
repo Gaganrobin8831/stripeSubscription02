@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { HandleRegister, HandleLogin, HandleGetDetail, HandleLogout ,HandleCustomerUpgrade} = require('../controller/user.controller');
-const { checkAuth } = require('../middleware/auth');
+const { checkAuth } = require('../middleware/auth.middleware');
 
 const userrouter = express.Router();
 

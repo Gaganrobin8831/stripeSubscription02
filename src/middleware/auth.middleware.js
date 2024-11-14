@@ -1,5 +1,5 @@
-const { validateToken } = require('../middleware/validate');
-const { validationErrorResponse } = require('../utility/response');
+const { validateToken } = require('./validate.middleware');
+const { validationErrorResponse } = require('../utility/response.utility');
 
 function checkAuth(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];

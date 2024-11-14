@@ -1,5 +1,5 @@
 const subscriptionModel = require('../models/subscription.model');
-const { validationErrorResponse } = require('../utility/response');
+const { validationErrorResponse } = require('../utility/response.utility');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
@@ -41,10 +41,11 @@ async function HandleCreateSubscription(req, res) {
             mode: 'subscription',
             customer: customerId,
             line_items: [{ price: price.id, quantity: 1 }],
-            success_url: `https://yourdomain.com/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://yourdomain.com/payment-failed`,
+            success_url: `https://subscription-5k7x.onrender.com/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://subscription-5k7x.onrender.com/payment-failed`,
         });
-
+        console.log(session);
+        
         // Save subscription details to database
         const subscription = new subscriptionModel({
             customerId,
@@ -57,7 +58,8 @@ async function HandleCreateSubscription(req, res) {
             interval: 'month',
             intervalCount,
             status: 'pending',  
-            startDate: new Date(),
+            startDate: session.subscription.start_date,
+            endDate:session.subscription.current_period_end
         });
 
         await subscription.save();
@@ -70,7 +72,6 @@ async function HandleCreateSubscription(req, res) {
     }
 }
 
-module.exports = { HandleCreateSubscription };
 
 module.exports= {
     HandleCreateSubscription
