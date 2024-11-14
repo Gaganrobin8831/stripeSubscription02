@@ -1,6 +1,6 @@
 const User = require('../models/user.models')
 const bcrypt = require('bcrypt')
-
+const subscriptionModel = require('../models/subscription.model');
 const { createTokenUser } = require('../middleware/validate.middleware');
 const { validationErrorResponse, successResponse } = require('../utility/response.utility');
 const jwt = require('jsonwebtoken')
@@ -322,6 +322,7 @@ async function HandleGetDetail(req, res) {
     }
 
     try {
+        
         const decoded = jwt.verify(token, process.env.secret);
         const user = await User.findById(decoded._id);
 
@@ -329,59 +330,93 @@ async function HandleGetDetail(req, res) {
             return validationErrorResponse(res, "error", "User not registered", 400);
         }
 
-        // Fetch all subscriptions associated with the customer
+        
         const subscriptions = await stripe.subscriptions.list({
             customer: user.custmorStripeId,
-            status: 'all',
-            limit: 100
+            status: 'active', 
+            limit: 1 
         });
 
-        // Format each subscription into a detailed object
-        const subscriptionHistory = await Promise.all(
-            subscriptions.data.map(async (sub) => {
-                const plan = sub.items.data[0].plan;
-                const productDetails = await stripe.products.retrieve(plan.product);
-                return {
-                    id: sub.id,
-                    status: sub.status,
-                    start_date: new Date(sub.start_date * 1000).toISOString(),
-                    current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
-                    current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-                    plan_name: productDetails.name,
-                    amount: plan.amount / 100,
-                    currency: plan.currency,
-                    interval: plan.interval,
-                    interval_count: plan.interval_count
-                };
-            })
-        );
+        if (subscriptions.data.length === 0) {
+            return validationErrorResponse(res, "error", "No active subscription found in Stripe", 404);
+        }
 
-        // Check for the active subscription
-        const activeSubscription = subscriptions.data.find(sub => sub.status === 'active');
-        let messageForNull = activeSubscription ? null : "No active subscription found";
+        const activeSubscription = subscriptions.data[0];
+        const plan = activeSubscription.items.data[0].plan;
+        const productDetails = await stripe.products.retrieve(plan.product);
 
+        
+        const activePlanDetails = {
+            id: activeSubscription.id,
+            status: activeSubscription.status,
+            start_date: new Date(activeSubscription.start_date * 1000).toISOString(),
+            current_period_start: new Date(activeSubscription.current_period_start * 1000).toISOString(),
+            current_period_end: new Date(activeSubscription.current_period_end * 1000).toISOString(),
+            plan_name: productDetails.name,
+            amount: plan.amount / 100, 
+            currency: plan.currency,
+            interval: plan.interval,
+            interval_count: plan.interval_count
+        };
 
-        // Build the response data
+        
+        const subscriptionHistory = await subscriptionModel.find({ customerId: user._id }).sort({ createdAt: -1 });
+
+        const dbActiveSubscription = await subscriptionModel.findOne({ customerId: user._id, status: 'active' });
+
+        if (dbActiveSubscription) {
+            const activePlanFromStripe = activeSubscription.items.data[0].plan;
+            const planNameFromStripe = productDetails.name;
+            const amountFromStripe = activePlanFromStripe.amount / 100; 
+
+            if (
+                dbActiveSubscription.planName !== planNameFromStripe ||
+                dbActiveSubscription.amount !== amountFromStripe
+            ) {
+                await subscriptionModel.updateOne(
+                    { _id: dbActiveSubscription._id },
+                    { $set: { status: 'pending' } }
+                );
+
+                const newSubscription = new subscriptionModel({
+                    customerId: user._id,
+                    productId: activePlanFromStripe.product,
+                    priceId: activePlanFromStripe.id,
+                    planName: planNameFromStripe,
+                    amount: amountFromStripe,
+                    currency: activePlanFromStripe.currency,
+                    interval: activePlanFromStripe.interval,
+                    intervalCount: activePlanFromStripe.interval_count,
+                    status: 'active',
+                    startDate: new Date(activeSubscription.start_date * 1000),
+                    endDate: new Date(activeSubscription.current_period_end * 1000),
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                });
+
+                await newSubscription.save();  
+            }
+        } else {
+            
+            return validationErrorResponse(res, "error", "No active subscription found in the database", 404);
+        }
+
         const responseData = {
             fullName: user.FullName,
             emailId: user.email,
             contactNumber: `${user.countryCode} ${user.contactNumber}`,
-            messageForNull,
-            activePlan: activeSubscription
-                ? {
-                    planName: subscriptionHistory.find(sub => sub.id === activeSubscription.id)?.plan_name,
-                    amount: activeSubscription.items.data[0].plan.amount / 100,
-                    currency: activeSubscription.items.data[0].plan.currency,
-                    interval: activeSubscription.items.data[0].plan.interval,
-                    intervalCount: activeSubscription.items.data[0].plan.interval_count,
-                    startDate: new Date(activeSubscription.start_date * 1000).toISOString(),
-                    endDate: activeSubscription.current_period_end
-                        ? new Date(activeSubscription.current_period_end * 1000).toISOString()
-                        : null
-                }
-                : null,
-            subscriptionHistory,
-           
+            activePlan: activePlanDetails, 
+            subscriptionHistory: subscriptionHistory.map(sub => ({
+                id: sub.id,
+                planName: sub.planName,
+                amount: sub.amount,
+                currency: sub.currency,
+                interval: sub.interval,
+                intervalCount: sub.intervalCount,
+                status: sub.status,
+                startDate: sub.startDate.toISOString(),
+                endDate: sub.endDate ? sub.endDate.toISOString() : null
+            }))
         };
 
         return successResponse(res, responseData, "User and Subscription Details", 200);

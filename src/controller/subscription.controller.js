@@ -63,7 +63,7 @@ async function HandleAddDataOfSubscription(req, res) {
     try {
         let { customerId } = req.user;
     
-        // Fetch active subscription from Stripe
+       
         const subscriptions = await stripe.subscriptions.list({
             customer: customerId,
             status: 'active',
@@ -72,7 +72,7 @@ async function HandleAddDataOfSubscription(req, res) {
     
         console.log(subscriptions);
     
-        // Check if no active subscriptions were found
+        
         if (subscriptions.data.length === 0) {
             return res.status(404).json({
                 status: "fail",
@@ -81,52 +81,51 @@ async function HandleAddDataOfSubscription(req, res) {
             });
         }
     
-        // Get the first active subscription
+     
         const activeSubscription = subscriptions.data[0];
     
-        // Access the subscription item and price details
-        const subscriptionItem = activeSubscription.items.data[0]; // First subscription item
-        const price = subscriptionItem.price;  // Price associated with the subscription item
+       
+        const subscriptionItem = activeSubscription.items.data[0];
+        const price = subscriptionItem.price;  
     
-        // The plan details are inside the price object, not separately under plan
-        const planName = price.nickname || price.product;  // Use nickname if available, otherwise use the product ID
-        const amount = price.unit_amount / 100; // Convert from cents to dollars
+
+        const planName = price.nickname || price.product;  
+        const amount = price.unit_amount / 100; 
         const currency = price.currency; 
-        const interval = price.recurring.interval;  // Interval (e.g., 'month', 'year')
-        const intervalCount = price.recurring.interval_count || 1;  // Default to 1 if not available
+        const interval = price.recurring.interval;  
+        const intervalCount = price.recurring.interval_count || 1; 
     
-        // Convert start and end dates from Unix timestamps (seconds) to milliseconds
+      
         const startDate = activeSubscription.start_date * 1000;
         const endDate = activeSubscription.current_period_end * 1000;
     
-        // Fetch the product details using the productId from price
-        const product = await stripe.products.retrieve(price.product); // Retrieve the product object
+        
+        const product = await stripe.products.retrieve(price.product); 
     
-        // Prepare the subscription data to be saved in the database
+       
         const subscriptionData = {
             customerId: req.user.customerId,
-            productId: product.id,  // The product ID from the product object
-            priceId: price.id,      // The price ID
-            planName: planName,     // Plan name (could be nickname or product ID if nickname is not set)
-            amount: amount,         // Subscription amount
-            currency: currency,     // Currency
-            interval: interval,     // Interval (e.g., 'month')
-            intervalCount: intervalCount, // Interval count (e.g., 1 month, 12 months)
-            status: activeSubscription.status, // Subscription status (e.g., 'active')
-            startDate: startDate,   // Start date of subscription
-            endDate: endDate,       // End date of subscription
-            productName: product.name, // Product name
-            productDescription: product.description, // Product description
-            createdAt: new Date(),  // Timestamp when this data is saved
-            updatedAt: new Date()   // Timestamp of the last update
+            productId: product.id,  
+            priceId: price.id,     
+            planName: planName,    
+            amount: amount,         
+            currency: currency,     
+            interval: interval,     
+            intervalCount: intervalCount, 
+            status: activeSubscription.status, 
+            startDate: startDate,   
+            endDate: endDate,       
+            productName: product.name, 
+            productDescription: product.description, 
+            createdAt: new Date(),  
+            updatedAt: new Date()   
         };
     
-        // Save the subscription data to the database
+       
         const newSubscription = await subscriptionModel.create(subscriptionData);
     
         console.log(newSubscription);
     
-        // Return success response
         return res.status(201).json({
             status: "success",
             message: "Subscription saved successfully",
