@@ -41,8 +41,8 @@ async function HandleCreateSubscription(req, res) {
             mode: 'subscription',
             customer: customerId,
             line_items: [{ price: price.id, quantity: 1 }],
-            success_url: `https://yourdomain.com/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://yourdomain.com/payment-failed`,
+            success_url: `http://localhost:3000/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `http://localhost:3000/payment-failed`,
         });
 
         const subscriptionData = await subscriptionModel.create({
