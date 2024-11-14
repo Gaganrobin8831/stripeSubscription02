@@ -1,8 +1,8 @@
 const User = require('../models/user.models')
 const bcrypt = require('bcrypt')
 
-const { createTokenUser } = require('../middleware/validate');
-const { validationErrorResponse, successResponse } = require('../utility/response');
+const { createTokenUser } = require('../middleware/validate.middleware');
+const { validationErrorResponse, successResponse } = require('../utility/response.utility');
 const jwt = require('jsonwebtoken')
 
 const validator = require('validator');
@@ -66,7 +66,8 @@ async function HandleRegister(req, res) {
         await newUser.save();
 
         // Respond with success message
-        return successResponse(res, newUser, "Registration successful", 200);
+      
+        // return successResponse(res, newUser, "Registration successful", 200);
 
     } catch (error) {
         console.error("Error during registration:", error);
@@ -165,75 +166,75 @@ async function HandleLogin(req, res) {
 
 // }
 
-async function HandleGetDetail(req, res) {
+// async function HandleGetDetail(req, res) {
    
          
-        const token = req.headers.authorization?.split(' ')[1];
+//         const token = req.headers.authorization?.split(' ')[1];
 
-        if (!token) {
-            return validationErrorResponse(res, "error", "Unauthorized", 401);
-        }
+//         if (!token) {
+//             return validationErrorResponse(res, "error", "Unauthorized", 401);
+//         }
         
-        try {
-            const decoded = jwt.verify(token, process.env.secret);
-            const user = await User.findById(decoded._id);
+//         try {
+//             const decoded = jwt.verify(token, process.env.secret);
+//             const user = await User.findById(decoded._id);
         
-            if (!user) {
-                return validationErrorResponse(res, "error", "User not registered", 400);
-            }
-            console.log({user});
+//             if (!user) {
+//                 return validationErrorResponse(res, "error", "User not registered", 400);
+//             }
+//             console.log({user});
             
         
-            // Retrieve the customer's active subscriptions from Stripe
-            const subscriptions = await stripe.subscriptions.list({
-                customer: user.custmorStripeId,
-                status: 'active',
-                limit: 1
-            });
-        console.log(subscriptions.data);
+//             // Retrieve the customer's active subscriptions from Stripe
+//             const subscriptions = await stripe.subscriptions.list({
+//                 customer: user.custmorStripeId,
+//                 status: 'active',
+//                 limit: 1
+//             });
+//         console.log(subscriptions.data);
         
-            let messageForNull;
-            const activeSubscription = subscriptions.data[0];
+//             let messageForNull;
+//             const activeSubscription = subscriptions.data[0];
         
-            if (!activeSubscription) {
-                messageForNull = "No active subscription found";
-            }
+//             if (!activeSubscription) {
+//                 messageForNull = "No active subscription found";
+//             }
         
-            let productName = null;
-            if (activeSubscription) {
-                // Retrieve the plan and then get the product details
-                const plan = activeSubscription.items.data[0].plan;
+//             let productName = null;
+//             if (activeSubscription) {
+//                 // Retrieve the plan and then get the product details
+//                 const plan = activeSubscription.items.data[0].plan;
                 
-                // Get the product details using the product ID
-                const productDetails = await stripe.products.retrieve(plan.product);
-                productName = productDetails.name;
-            }
+//                 // Get the product details using the product ID
+//                 const productDetails = await stripe.products.retrieve(plan.product);
+//                 productName = productDetails.name;
+//             }
         
-            // Build the response data
-            const responseData = {
-                fullName: user.FullName,
-                emailId: user.email,
-                contactNumber: `${user.countryCode} ${user.contactNumber}`,
-                messageForNull,
-                activePlan: {
-                    planName: productName,
-                    amount: activeSubscription?.items.data[0].plan.amount / 100,  // Convert cents to dollars
-                    currency: activeSubscription?.items.data[0].plan.currency,
-                    interval: activeSubscription?.items.data[0].plan.interval,
-                    intervalCount: activeSubscription?.items.data[0].plan.interval_count,
-                    startDate: new Date(activeSubscription?.start_date * 1000), // Convert Unix timestamp to date
-                    endDate: activeSubscription?.current_period_end ? new Date(activeSubscription.current_period_end * 1000) : null
-                }
-            };
+//             // Build the response data
+//             const responseData = {
+//                 fullName: user.FullName,
+//                 emailId: user.email,
+//                 contactNumber: `${user.countryCode} ${user.contactNumber}`,
+//                 messageForNull,
+//                 activePlan: {
+//                     planName: productName,
+//                     amount: activeSubscription?.items.data[0].plan.amount / 100,  // Convert cents to dollars
+//                     currency: activeSubscription?.items.data[0].plan.currency,
+//                     interval: activeSubscription?.items.data[0].plan.interval,
+//                     intervalCount: activeSubscription?.items.data[0].plan.interval_count,
+//                     startDate: new Date(activeSubscription?.start_date * 1000), // Convert Unix timestamp to date
+//                     endDate: activeSubscription?.current_period_end ? new Date(activeSubscription.current_period_end * 1000) : null
+//                 }
+//             };
         
-            return successResponse(res, responseData, "User and Subscription Details", 200);
+//             return successResponse(res, responseData, "User and Subscription Details", 200);
         
-        } catch (error) {
-            console.error("Error retrieving subscription details:", error);
-            return validationErrorResponse(res, "error", "Failed to retrieve subscription details", 500);
-        }
+//         } catch (error) {
+//             console.error("Error retrieving subscription details:", error);
+//             return validationErrorResponse(res, "error", "Failed to retrieve subscription details", 500);
+//         }
         
-}
+// }
 
 
 // async function HandleGetDetail(req, res) {
@@ -252,11 +253,12 @@ async function HandleGetDetail(req, res) {
 
 //         // Fetch all subscriptions associated with the customer
 //         const subscriptions = await stripe.subscriptions.list({
-//             customer: user.customerId,
+//             customer: user.custmorStripeId,
 //             status: 'all', // Fetch all subscriptions
 //             limit: 100 // Adjust limit as needed
 //         });
-
+//         console.log(subscriptions.data[0].items.data[0].plan);
+        
 //         // Format each subscription into a detailed object
 //         const subscriptionHistory = await Promise.all(
 //             subscriptions.data.map(async (sub) => {
@@ -311,6 +313,83 @@ async function HandleGetDetail(req, res) {
 //         return validationErrorResponse(res, "error", "Failed to retrieve subscription details", 500);
 //     }
 // }
+
+async function HandleGetDetail(req, res) {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return validationErrorResponse(res, "error", "Unauthorized", 401);
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.secret);
+        const user = await User.findById(decoded._id);
+
+        if (!user) {
+            return validationErrorResponse(res, "error", "User not registered", 400);
+        }
+
+        // Fetch all subscriptions associated with the customer
+        const subscriptions = await stripe.subscriptions.list({
+            customer: user.custmorStripeId,
+            status: 'all',
+            limit: 100
+        });
+
+        // Format each subscription into a detailed object
+        const subscriptionHistory = await Promise.all(
+            subscriptions.data.map(async (sub) => {
+                const plan = sub.items.data[0].plan;
+                const productDetails = await stripe.products.retrieve(plan.product);
+                return {
+                    id: sub.id,
+                    status: sub.status,
+                    start_date: new Date(sub.start_date * 1000).toISOString(),
+                    current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
+                    current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+                    plan_name: productDetails.name,
+                    amount: plan.amount / 100,
+                    currency: plan.currency,
+                    interval: plan.interval,
+                    interval_count: plan.interval_count
+                };
+            })
+        );
+
+        // Check for the active subscription
+        const activeSubscription = subscriptions.data.find(sub => sub.status === 'active');
+        let messageForNull = activeSubscription ? null : "No active subscription found";
+
+
+        // Build the response data
+        const responseData = {
+            fullName: user.FullName,
+            emailId: user.email,
+            contactNumber: `${user.countryCode} ${user.contactNumber}`,
+            messageForNull,
+            activePlan: activeSubscription
+                ? {
+                    planName: subscriptionHistory.find(sub => sub.id === activeSubscription.id)?.plan_name,
+                    amount: activeSubscription.items.data[0].plan.amount / 100,
+                    currency: activeSubscription.items.data[0].plan.currency,
+                    interval: activeSubscription.items.data[0].plan.interval,
+                    intervalCount: activeSubscription.items.data[0].plan.interval_count,
+                    startDate: new Date(activeSubscription.start_date * 1000).toISOString(),
+                    endDate: activeSubscription.current_period_end
+                        ? new Date(activeSubscription.current_period_end * 1000).toISOString()
+                        : null
+                }
+                : null,
+            subscriptionHistory,
+           
+        };
+
+        return successResponse(res, responseData, "User and Subscription Details", 200);
+
+    } catch (error) {
+        console.error("Error retrieving subscription details:", error);
+        return validationErrorResponse(res, "error", "Failed to retrieve subscription details", 500);
+    }
+}
 
 
 async function HandleLogout(req,res) {
