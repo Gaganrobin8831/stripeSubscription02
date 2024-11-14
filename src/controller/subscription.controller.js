@@ -1,3 +1,4 @@
+const subscriptionModel = require('../models/subscription.model');
 const { validationErrorResponse } = require('../utility/response');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
@@ -44,22 +45,22 @@ async function HandleCreateSubscription(req, res) {
             cancel_url: `https://yourdomain.com/payment-failed`,
         });
 
-        // // Save subscription details to database
-        // const subscription = new Subscription({
-        //     customerId,
-        //     productId: product.id,
-        //     priceId: price.id,
-        //     subscriptionId: session.subscription || "pending",  // Placeholder until Stripe confirms subscription ID
-        //     planName,
-        //     amount: parseInt(amount) * 100,
-        //     currency: 'usd',
-        //     interval: 'month',
-        //     intervalCount,
-        //     status: 'pending',  // Mark as pending until Stripe confirms subscription status
-        //     startDate: new Date(),
-        // });
+        // Save subscription details to database
+        const subscription = new subscriptionModel({
+            customerId,
+            productId: product.id,
+            priceId: price.id,
+            subscriptionId: session.subscription || "pending",  
+            planName,
+            amount: parseInt(amount) * 100,
+            currency: 'usd',
+            interval: 'month',
+            intervalCount,
+            status: 'pending',  
+            startDate: new Date(),
+        });
 
-        // await subscription.save();
+        await subscription.save();
 
         // Send the session URL for checkout
         res.json({ url: session.url });
