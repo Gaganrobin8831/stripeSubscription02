@@ -222,6 +222,7 @@ async function HandleGetDetail(req, res) {
             limit: 1 
         });
         console.log(subscriptions.data);
+
         let messageForNull
         if (!subscriptions.data.length) {
             messageForNull = "No Data"
@@ -282,7 +283,7 @@ async function HandleGetDetail(req, res) {
             }
         } else {
             
-            return validationErrorResponse(res, "error", "No active subscription found in the database", 404);
+            messageForNull = "No Data"
         }
 
         const responseData = {
