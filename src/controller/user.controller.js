@@ -68,7 +68,7 @@ async function HandleRegister(req, res) {
         // Respond with success message
       
         // return successResponse(res, newUser, "Registration successful", 200);
-
+        return { status: "success", message: "Registration updated successfully" };
     } catch (error) {
         console.error("Error during registration:", error);
         return validationErrorResponse(res, error, 'Internal Server Error', 500);
