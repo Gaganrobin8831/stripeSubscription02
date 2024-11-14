@@ -206,7 +206,7 @@ async function HandleGetDetail(req, res) {
 
     try {
         
-       const {_id,customerId} = req.user
+       const {_id,customerId,name,email} = req.user
     //    console.log({_id,customerId});
        
         const user = await User.findById(_id);
@@ -226,6 +226,28 @@ async function HandleGetDetail(req, res) {
         let messageForNull
         if (subscriptions.data.length == 0) {
             messageForNull = "No Data"
+            const subscriptionHistory = await subscriptionModel.find({ customerId: customerId}).sort({ createdAt: -1 });
+            const responseData = {
+                fullName: name,
+                emailId: email,
+                contactNumber: `${user.countryCode} ${user.contactNumber}`,
+                messageForNull,
+                activePlan: [], 
+                subscriptionHistory: subscriptionHistory.map(sub => ({
+                    id: sub.id,
+                    planName: sub.planName,
+                    amount: sub.amount,
+                    currency: sub.currency,
+                    interval: sub.interval,
+                    intervalCount: sub.intervalCount,
+                    status: sub.status,
+                    startDate: sub.startDate.toISOString(),
+                    endDate: sub.endDate ? sub.endDate.toISOString() : null
+                }))
+            };
+    
+            return successResponse(res, responseData, "User and Subscription Details", 200);
+       
         }
 
         const activeSubscription = subscriptions.data[0];
