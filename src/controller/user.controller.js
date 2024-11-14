@@ -221,7 +221,7 @@ async function HandleGetDetail(req, res) {
             status: 'active', 
             limit: 1 
         });
-        console.log(subscriptions.data);
+        // console.log(subscriptions.data);
 
         let messageForNull
         if (subscriptions.data.length == 0) {
@@ -254,6 +254,8 @@ async function HandleGetDetail(req, res) {
         const plan = activeSubscription.items.data[0].plan;
         const productDetails = await stripe.products.retrieve(plan.product);
 
+    console.log(productDetails);
+   
     
         const activePlanDetails = {
             planName: productDetails.name, 
@@ -269,7 +271,7 @@ async function HandleGetDetail(req, res) {
         const subscriptionHistory = await subscriptionModel.find({ customerId: customerId}).sort({ createdAt: -1 });
 
         const dbActiveSubscription = await subscriptionModel.findOne({ customerId: customerId,status:"active"});
-        console.log({dbActiveSubscription});
+        // console.log({dbActiveSubscription});
         
         if (dbActiveSubscription) {
             const activePlanFromStripe = activeSubscription.items.data[0].plan;
@@ -289,7 +291,7 @@ async function HandleGetDetail(req, res) {
                     customerId: customerId,
                     productId: activePlanFromStripe.product,
                     priceId: activePlanFromStripe.id,
-                    planName: planNameFromStripe,
+                    planName: productDetails.name,
                     amount: amountFromStripe,
                     currency: activePlanFromStripe.currency,
                     interval: activePlanFromStripe.interval,

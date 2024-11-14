@@ -13,7 +13,7 @@ userrouter.route('/regester').post(HandleRegister)
 userrouter.route('/Login').post(HandleLogin);
 userrouter.route('/Logout').post(HandleLogout);
 
-userrouter.route('/showdata').get(checkAuth, HandleGetDetail)
+userrouter.route('/userDetailAndSubscriptionHistory').get(checkAuth, HandleGetDetail)
 
 userrouter.route('/customers').get(HandleCustomerUpgrade)
 
