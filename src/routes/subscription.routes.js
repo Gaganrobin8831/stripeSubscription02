@@ -7,7 +7,7 @@ const { HandleCreateSubscription, HandleAddDataOfSubscription } = require('../co
 
 
 subsciptionrouter.route('/subscribe').post(checkAuth,HandleCreateSubscription)
-subsciptionrouter.route('/UpdateSubscriptionTime').post(checkAuth,HandleAddDataOfSubscription)
+subsciptionrouter.route('/updateSubscriptionTime').post(checkAuth,HandleAddDataOfSubscription)
 
 module.exports = {
     subsciptionrouter

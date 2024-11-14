@@ -1,7 +1,7 @@
 const subscriptionModel = require('../models/subscription.model');
 const { validationErrorResponse, successResponse } = require('../utility/response.utility');
 
-const stripe = require('stripe')(process.env.secret)
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 async function HandleCreateSubscription(req, res) {
     const { planName, amount } = req.body;
