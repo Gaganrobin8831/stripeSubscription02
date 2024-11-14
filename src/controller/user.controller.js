@@ -225,7 +225,7 @@ async function HandleGetDetail(req, res) {
 
         let messageForNull
         if (subscriptions.data.length == 0) {
-            messageForNull = "No Data"
+            messageForNull = null
             const subscriptionHistory = await subscriptionModel.find({ customerId: customerId}).sort({ createdAt: -1 });
             const responseData = {
                 fullName: name,
@@ -305,10 +305,7 @@ async function HandleGetDetail(req, res) {
 
                 await newSubscription.save();  
             }
-        } else {
-            
-            messageForNull = "No Data"
-        }
+        } 
 
         const responseData = {
             fullName: user.FullName,
