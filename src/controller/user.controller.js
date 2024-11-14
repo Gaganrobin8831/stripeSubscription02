@@ -222,10 +222,10 @@ async function HandleGetDetail(req, res) {
             limit: 1 
         });
         console.log(subscriptions.data);
-        
-        // if (!subscriptions.data.length) {
-        //     return validationErrorResponse(res, "error", "No active subscription found in Stripe", 404);
-        // }
+        let messageForNull
+        if (!subscriptions.data.length) {
+            messageForNull = "No Data"
+        }
 
         const activeSubscription = subscriptions.data[0];
         const plan = activeSubscription.items.data[0].plan;
@@ -245,7 +245,7 @@ async function HandleGetDetail(req, res) {
     
         const subscriptionHistory = await subscriptionModel.find({ customerId: customerId}).sort({ createdAt: -1 });
 
-        const dbActiveSubscription = await subscriptionModel.findOne({ customerId: customerId});
+        const dbActiveSubscription = await subscriptionModel.findOne({ customerId: customerId,status:"active"});
         console.log({dbActiveSubscription});
         
         if (dbActiveSubscription) {
@@ -263,7 +263,7 @@ async function HandleGetDetail(req, res) {
                 );
 
                 const newSubscription = new subscriptionModel({
-                    customerId: user._id,
+                    customerId: customerId,
                     productId: activePlanFromStripe.product,
                     priceId: activePlanFromStripe.id,
                     planName: planNameFromStripe,
@@ -289,6 +289,7 @@ async function HandleGetDetail(req, res) {
             fullName: user.FullName,
             emailId: user.email,
             contactNumber: `${user.countryCode} ${user.contactNumber}`,
+            messageForNull,
             activePlan: activePlanDetails, 
             subscriptionHistory: subscriptionHistory.map(sub => ({
                 id: sub.id,
