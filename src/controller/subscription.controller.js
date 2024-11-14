@@ -89,7 +89,7 @@ async function HandleAddDataOfSubscription(req, res) {
         const price = subscriptionItem.price;  
     
 
-        const planName = price.nickname || price.product;  
+          
         const amount = price.unit_amount / 100; 
         const currency = price.currency; 
         const interval = price.recurring.interval;  
@@ -110,7 +110,7 @@ async function HandleAddDataOfSubscription(req, res) {
             customerId: req.user.customerId,
             productId: product.id,  
             priceId: price.id,     
-            planName: planName,    
+            planName: product.name,    
             amount: amount,         
             currency: currency,     
             interval: interval,     

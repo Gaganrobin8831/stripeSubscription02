@@ -254,7 +254,7 @@ async function HandleGetDetail(req, res) {
         const plan = activeSubscription.items.data[0].plan;
         const productDetails = await stripe.products.retrieve(plan.product);
 
-    console.log(productDetails);
+    // console.log(productDetails.name);
    
     
         const activePlanDetails = {
@@ -301,7 +301,8 @@ async function HandleGetDetail(req, res) {
                     createdAt: new Date(),
                     updatedAt: new Date()
                 });
-
+                console.log(newSubscription);
+                
                 await newSubscription.save();  
             }
         } 
