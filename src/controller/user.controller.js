@@ -224,7 +224,7 @@ async function HandleGetDetail(req, res) {
         console.log(subscriptions.data);
 
         let messageForNull
-        if (!subscriptions.data.length) {
+        if (subscriptions.data.length == 0) {
             messageForNull = "No Data"
         }
 
