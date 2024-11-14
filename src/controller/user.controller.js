@@ -225,7 +225,7 @@ async function HandleGetDetail(req, res) {
 
         let messageForNull
         if (subscriptions.data.length == 0) {
-            messageForNull = null
+            messageForNull = "No Data"
             const subscriptionHistory = await subscriptionModel.find({ customerId: customerId}).sort({ createdAt: -1 });
             const responseData = {
                 fullName: name,
@@ -312,6 +312,7 @@ async function HandleGetDetail(req, res) {
             contactNumber: `${user.countryCode} ${user.contactNumber}`,
             messageForNull,
             activePlan: activePlanDetails, 
+            messageForNull:null,
             subscriptionHistory: subscriptionHistory.map(sub => ({
                 id: sub.id,
                 planName: sub.planName,
