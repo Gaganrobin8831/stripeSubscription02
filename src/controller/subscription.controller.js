@@ -62,6 +62,7 @@ console.log({ planName, amount })
 async function HandleAddDataOfSubscription(req, res) {
     try {
         let { customerId } = req.user;
+        console.log(req.user)
     
        
         const subscriptions = await stripe.subscriptions.list({

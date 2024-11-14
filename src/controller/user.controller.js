@@ -121,118 +121,43 @@ async function HandleLogin(req, res) {
 }
 
 
-// async function HandleGetDetail(req, res) {
-//     const token = req.headers.authorization?.split(' ')[1];
-//     if (!token) {
-//         return validationErrorResponse(res, "error", "Unauthorized", 401);
-//     }
-
-//     try {
-//         const decoded = jwt.verify(token, process.env.secret);
-//         const user = await User.findById(decoded._id);
-
-//         if (!user) {
-//             return validationErrorResponse(res, "error", "User not registered", 400);
-//         }
-
-       
-//         const subscriptions = await stripe.subscriptions.list({
-//             customer: user.custmorStripeId,
-//             status: 'all', 
-//             limit: 100 
-//         });
-//         console.log(subscriptions.data[0].items.data[0].plan);
-        
-        
-//         const subscriptionHistory = await Promise.all(
-//             subscriptions.data.map(async (sub) => {
-              
-//                 const plan = sub.items.data[0].plan;
-//                 const productDetails = await stripe.products.retrieve(plan.product);
-//                 return {
-//                     id: sub.id,
-//                     status: sub.status,
-//                     start_date: new Date(sub.start_date * 1000).toISOString(),
-//                     current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
-//                     current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-//                     plan_name: productDetails.name,
-//                     amount: plan.amount / 100, 
-//                     currency: plan.currency,
-//                     interval: plan.interval,
-//                     interval_count: plan.interval_count
-//                 };
-//             })
-//         );
-
- 
-//         const activeSubscription = subscriptions.data.find(sub => sub.status === 'active');
-//         let messageForNull = activeSubscription ? null : "No active subscription found";
-
-       
-//         const responseData = {
-//             fullName: user.FullName,
-//             emailId: user.email,
-//             contactNumber: `${user.countryCode} ${user.contactNumber}`,
-//             messageForNull,
-//             activePlan: activeSubscription
-//                 ? {
-//                     planName: subscriptionHistory.find(sub => sub.id === activeSubscription.id)?.plan_name,
-//                     amount: activeSubscription.items.data[0].plan.amount / 100,
-//                     currency: activeSubscription.items.data[0].plan.currency,
-//                     interval: activeSubscription.items.data[0].plan.interval,
-//                     intervalCount: activeSubscription.items.data[0].plan.interval_count,
-//                     startDate: new Date(activeSubscription.start_date * 1000).toISOString(),
-//                     endDate: activeSubscription.current_period_end
-//                         ? new Date(activeSubscription.current_period_end * 1000).toISOString()
-//                         : null
-//                 }
-//                 : null,
-//             subscriptionHistory
-//         };
-
-//         return successResponse(res, responseData, "User and Subscription Details", 200);
-
-//     } catch (error) {
-//         console.error("Error retrieving subscription details:", error);
-//         return validationErrorResponse(res, "error", "Failed to retrieve subscription details", 500);
-//     }
-// }
-
 async function HandleGetDetail(req, res) {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(' ')[1]; // Get token from header
     if (!token) {
-        return validationErrorResponse(res, "error", "Unauthorized", 401);
+        return validationErrorResponse(res, "error", "Unauthorized", 401); // If no token is found, return Unauthorized
     }
 
     try {
-        
-       const {_id,customerId,name,email} = req.user
-    //    console.log({_id,customerId});
-       
-        const user = await User.findById(_id);
+        const { _id, customerId, name, email } = req.user;
 
+        // Fetch user from the database
+        const user = await User.findById(_id);
         if (!user) {
-            return validationErrorResponse(res, "error", "User not registered", 400);
+            return validationErrorResponse(res, "error", "User not found", 400); // If user does not exist, return error
         }
 
-        
+        // Fetch active subscription from Stripe
         const subscriptions = await stripe.subscriptions.list({
             customer: customerId,
-            status: 'active', 
-            limit: 1 
+            status: 'active',
+            limit: 1
         });
-        // console.log(subscriptions.data);
 
-        let messageForNull
-        if (subscriptions.data.length == 0) {
-            messageForNull = "No Data"
-            const subscriptionHistory = await subscriptionModel.find({ customerId: customerId}).sort({ createdAt: -1 });
+        // Handle case if no active subscription is found in Stripe
+        let messageForNull;
+        if (subscriptions.data.length === 0) {
+            messageForNull = "No active subscription found";
+
+            // Fetch the user's subscription history from the database
+            const subscriptionHistory = await subscriptionModel.find({ customerId }).sort({ createdAt: -1 });
+
+            // Format response data
             const responseData = {
                 fullName: name,
                 emailId: email,
                 contactNumber: `${user.countryCode} ${user.contactNumber}`,
                 messageForNull,
-                activePlan: [], 
+                activePlan: [],
                 subscriptionHistory: subscriptionHistory.map(sub => ({
                     id: sub.id,
                     planName: sub.planName,
@@ -245,21 +170,18 @@ async function HandleGetDetail(req, res) {
                     endDate: sub.endDate ? sub.endDate.toISOString() : null
                 }))
             };
-    
+
             return successResponse(res, responseData, "User and Subscription Details", 200);
-       
         }
 
+        // Get the active plan details from Stripe
         const activeSubscription = subscriptions.data[0];
         const plan = activeSubscription.items.data[0].plan;
         const productDetails = await stripe.products.retrieve(plan.product);
 
-    // console.log(productDetails.name);
-   
-    
         const activePlanDetails = {
-            planName: productDetails.name, 
-            amount: plan.amount / 100, 
+            planName: productDetails.name,
+            amount: plan.amount / 100, // Convert from cents to dollars
             currency: plan.currency,
             interval: plan.interval,
             intervalCount: plan.interval_count,
@@ -267,53 +189,79 @@ async function HandleGetDetail(req, res) {
             endDate: new Date(activeSubscription.current_period_end * 1000).toISOString()
         };
 
-    
-        const subscriptionHistory = await subscriptionModel.find({ customerId: customerId}).sort({ createdAt: -1 });
+        // Fetch user's subscription history
+        const subscriptionHistory = await subscriptionModel.find({ customerId }).sort({ createdAt: -1 });
 
-        const dbActiveSubscription = await subscriptionModel.findOne({ customerId: customerId,status:"active"});
-        // console.log({dbActiveSubscription});
-        
+        // Check if there is an active subscription in the DB
+        const dbActiveSubscription = await subscriptionModel.findOne({ customerId, status: 'active' });
+
+        // Compare the active subscription in the DB with Stripe's active subscription
         if (dbActiveSubscription) {
             const activePlanFromStripe = activeSubscription.items.data[0].plan;
-            
-            const amountFromStripe = activePlanFromStripe.amount / 100; 
+            const amountFromStripe = activePlanFromStripe.amount / 100;
+            const planMatches = (
+                dbActiveSubscription.amount === amountFromStripe &&
+                dbActiveSubscription.currency === activePlanFromStripe.currency &&
+                dbActiveSubscription.interval === activePlanFromStripe.interval &&
+                dbActiveSubscription.intervalCount === activePlanFromStripe.interval_count &&
+                dbActiveSubscription.productId === activePlanFromStripe.product
+            );
 
-            if (
-                dbActiveSubscription.amount !== amountFromStripe
-            ) {
-                await subscriptionModel.updateOne(
-                    { _id: dbActiveSubscription._id },
-                    { $set: { status: 'pending' } }
-                );
-
-                const newSubscription = new subscriptionModel({
-                    customerId: customerId,
-                    productId: activePlanFromStripe.product,
-                    priceId: activePlanFromStripe.id,
-                    planName: productDetails.name,
-                    amount: amountFromStripe,
-                    currency: activePlanFromStripe.currency,
-                    interval: activePlanFromStripe.interval,
-                    intervalCount: activePlanFromStripe.interval_count,
-                    status: 'active',
-                    startDate: new Date(activeSubscription.start_date * 1000),
-                    endDate: new Date(activeSubscription.current_period_end * 1000),
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                });
-                console.log(newSubscription);
-                
-                await newSubscription.save();  
+            // If the active plans are the same, no need to create a new subscription
+            if (planMatches) {
+                return successResponse(res, {
+                    fullName: user.FullName,
+                    emailId: user.email,
+                    contactNumber: `${user.countryCode} ${user.contactNumber}`,
+                    activePlan: activePlanDetails,
+                    subscriptionHistory: subscriptionHistory.map(sub => ({
+                        id: sub.id,
+                        planName: sub.planName,
+                        amount: sub.amount,
+                        currency: sub.currency,
+                        interval: sub.interval,
+                        intervalCount: sub.intervalCount,
+                        status: sub.status,
+                        startDate: sub.startDate.toISOString(),
+                        endDate: sub.endDate ? sub.endDate.toISOString() : null
+                    }))
+                }, "User and Subscription Details", 200);
             }
-        } 
 
+            // If the active plans are different, update the active plan
+            // Mark previous active subscription as inactive
+            await subscriptionModel.updateOne(
+                { _id: dbActiveSubscription._id },
+                { $set: { status: 'inactive' } }
+            );
+        }
+
+        // Create a new subscription for the upgraded/downgraded plan
+        const newSubscription = new subscriptionModel({
+            customerId,
+            productId: activePlanDetails.productId,
+            priceId: activeSubscription.items.data[0].plan.id,
+            planName: productDetails.name,
+            amount: activePlanDetails.amount,
+            currency: activePlanDetails.currency,
+            interval: activePlanDetails.interval,
+            intervalCount: activePlanDetails.intervalCount,
+            status: 'active',
+            startDate: new Date(activeSubscription.start_date * 1000),
+            endDate: new Date(activeSubscription.current_period_end * 1000),
+            createdAt: new Date(),
+            updatedAt: new Date()
+        });
+
+        // Save the new subscription
+        await newSubscription.save();
+
+        // Format response data
         const responseData = {
             fullName: user.FullName,
             emailId: user.email,
             contactNumber: `${user.countryCode} ${user.contactNumber}`,
-            messageForNull,
-            activePlan: activePlanDetails, 
-            messageForNull:null,
+            activePlan: activePlanDetails,
             subscriptionHistory: subscriptionHistory.map(sub => ({
                 id: sub.id,
                 planName: sub.planName,
@@ -334,6 +282,143 @@ async function HandleGetDetail(req, res) {
         return validationErrorResponse(res, "error", "Failed to retrieve subscription details", 500);
     }
 }
+
+// async function HandleGetDetail(req, res) {
+//     const token = req.headers.authorization?.split(' ')[1];
+//     if (!token) {
+//         return validationErrorResponse(res, "error", "Unauthorized", 401);
+//     }
+
+//     try {
+        
+//        const {_id,customerId,name,email} = req.user
+//     //    console.log({_id,customerId});
+       
+//         const user = await User.findById(_id);
+
+//         if (!user) {
+//             return validationErrorResponse(res, "error", "User not registered", 400);
+//         }
+
+        
+//         const subscriptions = await stripe.subscriptions.list({
+//             customer: customerId,
+//             status: 'active', 
+//             limit: 1 
+//         });
+//         // console.log(subscriptions.data);
+
+//         let messageForNull
+//         if (subscriptions.data.length == 0) {
+//             messageForNull = "No Data"
+//             const subscriptionHistory = await subscriptionModel.find({ customerId: customerId}).sort({ createdAt: -1 });
+//             const responseData = {
+//                 fullName: name,
+//                 emailId: email,
+//                 contactNumber: `${user.countryCode} ${user.contactNumber}`,
+//                 messageForNull,
+//                 activePlan: [], 
+//                 subscriptionHistory: subscriptionHistory.map(sub => ({
+//                     id: sub.id,
+//                     planName: sub.planName,
+//                     amount: sub.amount,
+//                     currency: sub.currency,
+//                     interval: sub.interval,
+//                     intervalCount: sub.intervalCount,
+//                     status: sub.status,
+//                     startDate: sub.startDate.toISOString(),
+//                     endDate: sub.endDate ? sub.endDate.toISOString() : null
+//                 }))
+//             };
+    
+//             return successResponse(res, responseData, "User and Subscription Details", 200);
+       
+//         }
+
+//         const activeSubscription = subscriptions.data[0];
+//         const plan = activeSubscription.items.data[0].plan;
+//         const productDetails = await stripe.products.retrieve(plan.product);
+
+//     // console.log(productDetails.name);
+   
+    
+//         const activePlanDetails = {
+//             planName: productDetails.name, 
+//             amount: plan.amount / 100, 
+//             currency: plan.currency,
+//             interval: plan.interval,
+//             intervalCount: plan.interval_count,
+//             startDate: new Date(activeSubscription.start_date * 1000).toISOString(),
+//             endDate: new Date(activeSubscription.current_period_end * 1000).toISOString()
+//         };
+
+    
+//         const subscriptionHistory = await subscriptionModel.find({ customerId: customerId}).sort({ createdAt: -1 });
+
+//         const dbActiveSubscription = await subscriptionModel.findOne({ customerId: customerId,status:"active"});
+//         // console.log({dbActiveSubscription});
+        
+//         if (dbActiveSubscription) {
+//             const activePlanFromStripe = activeSubscription.items.data[0].plan;
+            
+//             const amountFromStripe = activePlanFromStripe.amount / 100; 
+
+//             if (
+//                 dbActiveSubscription.amount !== amountFromStripe
+//             ) {
+//                 await subscriptionModel.updateOne(
+//                     { _id: dbActiveSubscription._id },
+//                     { $set: { status: 'pending' } }
+//                 );
+
+//                 const newSubscription = new subscriptionModel({
+//                     customerId: customerId,
+//                     productId: activePlanFromStripe.product,
+//                     priceId: activePlanFromStripe.id,
+//                     planName: productDetails.name,
+//                     amount: amountFromStripe,
+//                     currency: activePlanFromStripe.currency,
+//                     interval: activePlanFromStripe.interval,
+//                     intervalCount: activePlanFromStripe.interval_count,
+//                     status: 'active',
+//                     startDate: new Date(activeSubscription.start_date * 1000),
+//                     endDate: new Date(activeSubscription.current_period_end * 1000),
+//                     createdAt: new Date(),
+//                     updatedAt: new Date()
+//                 });
+//                 console.log(newSubscription);
+                
+//                 await newSubscription.save();  
+//             }
+//         } 
+
+//         const responseData = {
+//             fullName: user.FullName,
+//             emailId: user.email,
+//             contactNumber: `${user.countryCode} ${user.contactNumber}`,
+//             messageForNull,
+//             activePlan: activePlanDetails, 
+//             messageForNull:null,
+//             subscriptionHistory: subscriptionHistory.map(sub => ({
+//                 id: sub.id,
+//                 planName: sub.planName,
+//                 amount: sub.amount,
+//                 currency: sub.currency,
+//                 interval: sub.interval,
+//                 intervalCount: sub.intervalCount,
+//                 status: sub.status,
+//                 startDate: sub.startDate.toISOString(),
+//                 endDate: sub.endDate ? sub.endDate.toISOString() : null
+//             }))
+//         };
+
+//         return successResponse(res, responseData, "User and Subscription Details", 200);
+
+//     } catch (error) {
+//         console.error("Error retrieving subscription details:", error);
+//         return validationErrorResponse(res, "error", "Failed to retrieve subscription details", 500);
+//     }
+// }
 
 async function HandleLogout(req,res) {
     try {
