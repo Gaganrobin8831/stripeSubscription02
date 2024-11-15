@@ -186,7 +186,8 @@ async function HandleGetDetail(req, res) {
             interval: plan.interval,
             intervalCount: plan.interval_count,
             startDate: new Date(activeSubscription.start_date * 1000).toISOString(),
-            endDate: new Date(activeSubscription.current_period_end * 1000).toISOString()
+            endDate: new Date(activeSubscription.current_period_end * 1000).toISOString(),
+            productId: plan.product
         };
 
         // Fetch user's subscription history
@@ -236,25 +237,38 @@ async function HandleGetDetail(req, res) {
             );
         }
 
-        // Create a new subscription for the upgraded/downgraded plan
-        const newSubscription = new subscriptionModel({
+        // Check if there is an existing active subscription with the same plan details
+        const dbExistingSubscription = await subscriptionModel.findOne({
             customerId,
             productId: activePlanDetails.productId,
             priceId: activeSubscription.items.data[0].plan.id,
-            planName: productDetails.name,
-            amount: activePlanDetails.amount,
-            currency: activePlanDetails.currency,
-            interval: activePlanDetails.interval,
-            intervalCount: activePlanDetails.intervalCount,
-            status: 'active',
-            startDate: new Date(activeSubscription.start_date * 1000),
-            endDate: new Date(activeSubscription.current_period_end * 1000),
-            createdAt: new Date(),
-            updatedAt: new Date()
+            status: 'active'
         });
 
-        // Save the new subscription
-        await newSubscription.save();
+        // If no existing active subscription, create a new one
+        if (!dbExistingSubscription) {
+            const newSubscription = new subscriptionModel({
+                customerId,
+                productId: activePlanDetails.productId,
+                priceId: activeSubscription.items.data[0].plan.id,
+                planName: productDetails.name,
+                amount: activePlanDetails.amount,
+                currency: activePlanDetails.currency,
+                interval: activePlanDetails.interval,
+                intervalCount: activePlanDetails.intervalCount,
+                status: 'active',
+                startDate: new Date(activeSubscription.start_date * 1000),
+                endDate: new Date(activeSubscription.current_period_end * 1000),
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+
+            // Save the new subscription
+            await newSubscription.save();
+        }
+
+        // Fetch the updated subscription history after saving the new active subscription
+        const updatedSubscriptionHistory = await subscriptionModel.find({ customerId }).sort({ createdAt: -1 });
 
         // Format response data
         const responseData = {
@@ -262,7 +276,7 @@ async function HandleGetDetail(req, res) {
             emailId: user.email,
             contactNumber: `${user.countryCode} ${user.contactNumber}`,
             activePlan: activePlanDetails,
-            subscriptionHistory: subscriptionHistory.map(sub => ({
+            subscriptionHistory: updatedSubscriptionHistory.map(sub => ({
                 id: sub.id,
                 planName: sub.planName,
                 amount: sub.amount,
