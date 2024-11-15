@@ -8,7 +8,7 @@ const subscriptionSchema = new mongoose.Schema({
     },
     productId: {
         type: String,
-        required: true,
+        
     },
     priceId: {
         type: String,
