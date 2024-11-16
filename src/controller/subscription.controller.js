@@ -14,7 +14,7 @@ async function HandleCreateSubscription(req, res) {
             error: "validationError"
         };
     }
-console.log({ planName, amount })
+// console.log({ planName, amount })
     const intervalCount = 1;
     try {
         const products = await stripe.products.list({ limit: 100 });

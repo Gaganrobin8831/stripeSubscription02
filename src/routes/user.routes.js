@@ -7,11 +7,11 @@ const userrouter = express.Router();
 
 
 
-userrouter.route('/regester').post(HandleRegister)
+userrouter.route('/register').post(HandleRegister)
 
 
-userrouter.route('/Login').post(HandleLogin);
-userrouter.route('/Logout').post(HandleLogout);
+userrouter.route('/login').post(HandleLogin);
+userrouter.route('/logout').post(HandleLogout);
 
 userrouter.route('/userDetailAndSubscriptionHistory').get(checkAuth, HandleGetDetail)
 
