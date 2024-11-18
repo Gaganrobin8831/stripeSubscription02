@@ -1,19 +1,19 @@
 # StripeSubscriptionService API
 
 
-# Overview
+## Overview
 The StripeSubscriptionService is an API for managing Stripe subscriptions. It provides endpoints for user registration, login, subscription creation, user detail retrieval, and managing subscriptions via the Stripe customer portal. This service uses Bearer token authentication for secure access to certain endpoints.
 
 Base URL
 The base URL for the API is:   http://localhost:2132/
 
 
-# Features
+## Features
 Create: Create customer and the Subscription using routes
 Read: View the full Detail of the user Subscription
 Update: Upgrate and Downgrade the user subscription
 
-#Prerequisites
+## Prerequisites
 Before you begin, ensure you have the following installed:
 ```
 1. Node.js (v20.15.0 or higher)
@@ -28,17 +28,19 @@ Before you begin, ensure you have the following installed:
 10. validator (For check email is valid or in valid format)
 11. dotenv (For Environment variables)
 ```
-# Installation
+## Installation
 Follow these steps to set up and run the project locally:
 
-# Clone the repository:
+## Clone the repository:
+```
 git clone https://github.com/Gaganrobin8831/stripeSubscription02.git
-
-# Install dependencies:
+```
+## Install dependencies:
+```
 npm install
-
-# Set up the environment variables:
-
+```
+## Set up the environment variables:
+```
 BASE_URL=https://subscription-5k7x.onrender.com/userArea
 
 
@@ -53,12 +55,13 @@ MONGO_URI=mongodb+srv://gagandeepnetweb:4j31A1tMeSMRAQsy@cluster0.e8ggm.mongodb.
 DB_NAME = stripe
 
 secret = qtert1823sdf
+```
 ------------------------------------------------------------------------------------------------------
-# Start the application:
+## Start the application:
 npm start
 
 
-# Swagger Testing
+## Swagger Testing
 This project includes a swagger.yaml file that defines the API endpoints, request parameters, and responses in a standardized OpenAPI format. You can use this file to test and document the API.
 
 Using the swagger.yaml File
@@ -69,10 +72,10 @@ Copy the contents of the swagger.yaml file from your project.
 Paste the contents into the editor.
 The Swagger Editor will display the API documentation, allowing you to interact with and test the API endpoints directly from the browser.
 
-# Postman Collection for API Testing
+### Postman Collection for API Testing
 To make API testing easier, a Postman collection is provided for this project. This collection includes all the necessary endpoints and can be used to quickly test the API without manually configuring each request.
 
-# Importing the Postman Collection
+### Importing the Postman Collection
 Follow these steps to import the Postman collection:
 
 1. Download the Postman Collection:
