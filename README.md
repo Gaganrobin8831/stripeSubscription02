@@ -58,17 +58,18 @@ secret = qtert1823sdf
 ```
 ------------------------------------------------------------------------------------------------------
 ## Start the application:
+```
 npm start
-
+```
 
 ## Swagger Testing
 This project includes a swagger.yaml file that defines the API endpoints, request parameters, and responses in a standardized OpenAPI format. You can use this file to test and document the API.
 
-Using the swagger.yaml File
-1. Use an Online Swagger Editor:
+Using the **swagger.yaml** File
+## Use an Online Swagger Editor:
 
 Visit the Swagger Editor.
-Copy the contents of the swagger.yaml file from your project.
+Copy the contents of the **swagger.yaml** file from your project.
 Paste the contents into the editor.
 The Swagger Editor will display the API documentation, allowing you to interact with and test the API endpoints directly from the browser.
 
