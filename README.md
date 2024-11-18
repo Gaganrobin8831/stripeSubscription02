@@ -80,17 +80,17 @@ To make API testing easier, a Postman collection is provided for this project. T
 ### Importing the Postman Collection
 Follow these steps to import the Postman collection:
 
-1. Download the Postman Collection:
+**1. Download the Postman Collection:**
 
 The Postman collection file (stripe.postman_collection.json) is included in the repository.
 
-2. Import the Collection into Postman:
+**2. Import the Collection into Postman:**
 
 Open Postman.
 Click on the "Import" button in the top left corner.
 Select the stripe.postman_collection.json file from your local machine.
 Click "Open" to import the collection.
 
-3. Start Testing:
+**3. Start Testing:**
 
 Once the collection is imported, you can start making requests to the API endpoints defined in the collection. Each request includes predefined settings for method, URL, headers, and body, making it easier to test the API.
