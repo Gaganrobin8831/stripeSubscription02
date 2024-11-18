@@ -41,20 +41,19 @@ npm install
 ```
 ## Set up the environment variables:
 ```
-BASE_URL=https://subscription-5k7x.onrender.com/userArea
+BASE_URL
 
+STRIPE_SECRET_KEY
 
-STRIPE_SECRET_KEY=sk_test_51QIqhRCfLWrjW8WUzZ3svtTzg5xpiSIcvOyOju5MCVHCfqXKQETzlVqqufJ24DNvYooXOwpdzTITukMghZzjgPvC001CB8aG2l
-
-SESSION_SECRET = ramu5236dudhvala
+SESSION_SECRET
 
 PORT = 2132
 
-MONGO_URI=mongodb+srv://gagandeepnetweb:4j31A1tMeSMRAQsy@cluster0.e8ggm.mongodb.net/stripe?retryWrites=true&w=majority
+MONGO_URI
 
-DB_NAME = stripe
+DB_NAME
 
-secret = qtert1823sdf
+secret
 ```
 ------------------------------------------------------------------------------------------------------
 ## Start the application:
