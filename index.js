@@ -1,19 +1,22 @@
 require('dotenv').config()
 const express = require('express')
+const app = express()
 const connectDB = require('./src/DB/database.DB')
 const userrouter = require('./src/routes/user.routes')
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('yamljs');
 
 const cookieParser = require('cookie-parser')
-
+const swaggerDocument = yaml.load('./swagger.yaml');
 const cors = require('cors')
 const { subsciptionrouter } = require('./src/routes/subscription.routes')
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
-const app = express()
 
 app.use(cors({
-    origin: '*', // This allows all origins, not recommended for production
+    origin: '*', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Authorization', 'Content-Type'],
 }));

@@ -1,0 +1,191 @@
+{
+	"info": {
+		"_postman_id": "a4921fd6-de1d-40c4-a7f1-f714134160f1",
+		"name": "stripe",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37371656"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fullName\":\"test\",\r\n    \"emailId\":\"test@gmail.com\",\r\n    \"password\":\"test@123\",\r\n    \"countryCode\":\"+91\",\r\n    \"contactNumber\":\"123456789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2132/regester",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2132",
+					"path": [
+						"regester"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"emailId\":\"tester21@gmail.com\",\r\n    \"password\":\"test@123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2132/Login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2132",
+					"path": [
+						"Login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUserDetail",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM1ZGU3ODA5YTc3MDFiOWFmMzFjNTIiLCJlbWFpbCI6InRlc3RlcjIxQGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0ZXIiLCJjdXN0b21lcklkIjoiY3VzX1JEUzZzRGloSWpBZzVMIiwiaWF0IjoxNzMxNTg0MTQzLCJleHAiOjE3MzE2NzA1NDN9.ji3Lc2LOp9QSNHAkPlh9gNa5qbaasDWUyltYxmmWbYc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2132/userDetailAndSubscriptionHistory",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2132",
+					"path": [
+						"userDetailAndSubscriptionHistory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createsubscription",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM1YTU1YTMyYjIzZjcwNmY1NWZlZWYiLCJlbWFpbCI6Imxha3NoYXlAZ21haWwuY29tIiwibmFtZSI6Imxha3NoYXkiLCJjdXN0b21lcklkIjoiY3VzX1JET0FyVm1GelJoY212IiwiaWF0IjoxNzMxNTY5NTAzLCJleHAiOjE3MzE2NTU5MDN9.CQO6EilieJBEMHEdCF3FnaR42cnnRs9Z2V6jXNdkvtk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"planName\":\"Starter\",\r\n    \"amount\":\"29\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2132/subscribe",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2132",
+					"path": [
+						"subscribe"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "custmorUpgrade",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzMzM2YzZjdiNTFkNzk2YmQ4NTc0MTIiLCJlbWFpbCI6Inl1dmlAZ21haWwuc28iLCJuYW1lIjoiWXV2cmFqIFNpbmdoIiwiY3VzdG9tZXJJZCI6ImN1c19SQ2h1ZG5JUmw1eXp0VSIsImlhdCI6MTczMTQ3NzM2NywiZXhwIjoxNzMxNTYzNzY3fQ.jZ2OUx1qGa1yoWGMRuFFw9VJX9V754eHZyv5GSZx3Co",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2132/customers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2132",
+					"path": [
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateSubscriptionTime",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM1YTkxYTAwODM5NDg3OGQwMDhhNTMiLCJlbWFpbCI6Inl1dmlAZ21haWwuc28iLCJuYW1lIjoiWXV2cmFqIFNpbmdoIiwiY3VzdG9tZXJJZCI6ImN1c19SRE9RVFpveTJ0U2hBRyIsImlhdCI6MTczMTU3MDAwMiwiZXhwIjoxNzMxNjU2NDAyfQ.HeCxz9ZQ31rrermoD9PUo7AK1mSlm_tNH76isqT351I",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2132/UpdateSubscriptionTime",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2132",
+					"path": [
+						"UpdateSubscriptionTime"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
