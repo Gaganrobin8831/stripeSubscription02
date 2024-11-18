@@ -8,7 +8,7 @@ function createTokenUser(user) {
     const payload = {
         _id: user._id,
         email: user.email,
-        name: user.FullName,
+        name: user.fullName,
         customerId:user.custmorStripeId
     };
     console.log(payload);

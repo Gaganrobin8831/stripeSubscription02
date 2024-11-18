@@ -9,7 +9,8 @@ const yaml = require('yamljs');
 const cookieParser = require('cookie-parser')
 const swaggerDocument = yaml.load('./swagger.yaml');
 const cors = require('cors')
-const { subsciptionrouter } = require('./src/routes/subscription.routes')
+const { subsciptionRouter } = require('./src/routes/subscription.routes')
+const { handleWebhook } = require('./src/controller/webhook.controller')
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -24,15 +25,18 @@ app.use(cors({
 
 const port = process.env.PORT || 2132;
 
+app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use('/', userrouter)
-app.use('/', subsciptionrouter)
+app.use('/', subsciptionRouter)
 
 app.get('/', (req, res) => {
-    res.send('Hello World')
+    res.send('Welcome To Stripe But You Come Wrong Url')
 })
+
 
 connectDB()
     .then(() => {

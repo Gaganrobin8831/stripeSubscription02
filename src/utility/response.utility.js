@@ -6,19 +6,20 @@ function  successResponse(res, data, message, statusCode = 200)  {
     });
   };
   
-  function  errorResponse(res, error = 'Something went wrong', statusCode = 500){
+  function  errorResponse(res, data, message, statusCode = 500){
     return res.status(statusCode).json({
       status: 'error',
-      message: error,
+      message,
+      data,
     });
   };
 
 
-  function validationErrorResponse(res, errors, message, statusCode = 400) {
+  function validationErrorResponse(res, data, message, statusCode = 400) {
     return res.status(statusCode).json({
         status: 'fail',
         message,
-        errors,
+        data,
       });
   }
   
