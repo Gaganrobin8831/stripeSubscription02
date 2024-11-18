@@ -15,19 +15,19 @@ Update: Upgrate and Downgrade the user subscription
 
 #Prerequisites
 Before you begin, ensure you have the following installed:
-
-Node.js (version 14 or higher)
-1. Npm (Node Package Manager)
-2. A MongoDB database (either a local instance or a MongoDB Atlas cloud database)
-3. Stripe (For connect withe stripe )
-4. jsonwebtoken ( For the token)
-5. bcrypt (For hashing password)
-6. express (For the server)
-7. mongoose (For the connect the MongoDb database)
-8. cors (For WhiteListing the frontend)
-9. validator (For check email is valid or in valid format)
-10. dotenv (For Environment variables)
-
+```
+1. Node.js (v20.15.0 or higher)
+2. Npm (Node Package Manager)
+3. A MongoDB database (either a local instance or a MongoDB Atlas cloud database)
+4. Stripe (For connect withe stripe )
+5. jsonwebtoken ( For the token)
+6. bcrypt (For hashing password)
+7. express (For the server)
+8. mongoose (For the connect the MongoDb database)
+9. cors (For WhiteListing the frontend)
+10. validator (For check email is valid or in valid format)
+11. dotenv (For Environment variables)
+```
 # Installation
 Follow these steps to set up and run the project locally:
 
