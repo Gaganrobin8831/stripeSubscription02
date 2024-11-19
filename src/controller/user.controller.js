@@ -3,12 +3,7 @@ const bcrypt = require('bcrypt')
 const subscriptionModel = require('../models/subscription.model');
 const { createTokenUser } = require('../middleware/validate.middleware');
 const { validationErrorResponse, successResponse, errorResponse } = require('../utility/response.utility');
-const validator = require('validator');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-
-function isValidEmail(email) {
-    return validator.isEmail(email);
-}
 
 async function handleRegister(req, res) {
     const { fullName, emailId, password, countryCode, contactNumber } = req.body;
