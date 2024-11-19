@@ -2,7 +2,7 @@ const User = require('../models/user.models')
 const bcrypt = require('bcrypt')
 const subscriptionModel = require('../models/subscription.model');
 const { createTokenUser } = require('../middleware/validate.middleware');
-const { validationErrorResponse, successResponse } = require('../utility/response.utility');
+const { validationErrorResponse, successResponse, errorResponse } = require('../utility/response.utility');
 const validator = require('validator');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
@@ -13,15 +13,6 @@ function isValidEmail(email) {
 async function handleRegister(req, res) {
     const { fullName, emailId, password, countryCode, contactNumber } = req.body;
     try {
-
-        if (!isValidEmail(emailId)) {
-            return validationErrorResponse(res, [], "Enter a valid email", 409);
-        }
-
-        if (!fullName || !emailId || !password || !countryCode || !contactNumber) {
-            return validationErrorResponse(res, [], "Enter fullName, email Id, password, and role", 409);
-        }
-
         const existingUser = await User.findOne({ email: emailId });
         if (existingUser) {
 
@@ -34,9 +25,10 @@ async function handleRegister(req, res) {
             }
         }
         const hashedPassword = await bcrypt.hash(password, 10);
+        // console.log({ fullName, emailId, password, countryCode, contactNumber });
 
         const newUser = new User({
-            fullName: fullName,
+            fullName: fullName.trim(),
             email: emailId,
             password: hashedPassword,
             contactNumber,
@@ -55,20 +47,13 @@ async function handleRegister(req, res) {
 
     } catch (error) {
         // console.error("Error during registration:", error);
-        return validationErrorResponse(res, error, 'Internal Server Error', 500);
+        return errorResponse(res,[error.message],'Internal Server Error',500)
     }
 }
 
 async function handleLogin(req, res) {
     const { emailId, password } = req.body;
     try {
-        if (isValidEmail(emailId) == false) {
-            return validationErrorResponse(res, "error", "Enter Valid Email", 409)
-        }
-
-        if (!emailId || !password) {
-            return validationErrorResponse(res, "error", "Enter email passeord ", 409)
-        }
         let token
 
         const user = await User.findOne({ email: emailId });
@@ -78,7 +63,7 @@ async function handleLogin(req, res) {
 
         const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
-            return validationErrorResponse(res, error, 'Invalid email or password', 400)
+            return validationErrorResponse(res, "error", 'Invalid email or password', 400)
         }
 
         token = createTokenUser(user);
@@ -94,7 +79,7 @@ async function handleLogin(req, res) {
         return successResponse(res, data, "Login Success", 200)
     } catch (error) {
         // console.log(error);
-        return validationErrorResponse(res, error, 'Internal Server Error', 500);
+        return errorResponse(res,[error.message],'Internal Server Error',500)
     }
 }
 
@@ -168,7 +153,7 @@ async function handleGetDetail(req, res) {
 
     } catch (error) {
         // console.error("Error retrieving subscription details:", error);
-        return validationErrorResponse(res, "error", "Failed to retrieve subscription details", 500);
+        return errorResponse(res, [error.message], "Failed to retrieve subscription details", 500);
     }
 }
 
@@ -187,7 +172,8 @@ async function handleLogout(req, res) {
         return successResponse(res, {}, "Logout successful", 200);
     } catch (error) {
         // console.error('Logout Error:', error);
-        return validationErrorResponse(res, error, 'Internal Server Error', 500);
+        return errorResponse(res, [error.message], 'Internal Server Error', 500)
+
     }
 }
 
@@ -202,7 +188,7 @@ async function handleCustomerUpgrade(req, res) {
         successResponse(res, portalSession.url, "Success", 200)
     } catch (error) {
         // console.error(error);
-        return validationErrorResponse(res, error, 'Internal Server Error', 500);
+        return errorResponse(res, [error.message], 'Internal Server Error', 500)
     }
 }
 

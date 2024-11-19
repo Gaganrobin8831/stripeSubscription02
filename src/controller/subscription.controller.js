@@ -33,18 +33,12 @@ async function handleCreateSubscription(req, res) {
             cancel_url: `https://subscription-5k7x.onrender.com/payment-failed`,
         });
 
-        res.json({
-            status: "success",
-            sessionUrl: session.url
-        });
-
+        
+    return successResponse(res,session.url,"Success",200)
     } catch (error) {
         console.error('Error creating subscription:', error);
-        return res.status(500).json({
-            status: "fail",
-            message: "Error creating subscription",
-            error: error.message
-        });
+        return errorResponse(res,[error.message],"Error creating subscription",500)
+      
     }
 }
 
@@ -69,15 +63,14 @@ async function handleProductsData(req, res) {
             }
         }));
         const validPlans = plans.filter(plan => plan !== null);
-        console.log("Valid Plans:", validPlans);
+        // console.log("Valid Plans:", validPlans);
 
         res.json({ plans: validPlans });
         successResponse(res, validPlans, "Success", 200)
 
     } catch (error) {
-        console.error("Error fetching products:", error);
-
-        return errorResponse(res, "Error", "Failed to fetch products", 500)
+        // console.error("Error fetching products:", error);
+        return errorResponse(res,[error.message],"Failed to fetch products",500)
     }
 }
 
