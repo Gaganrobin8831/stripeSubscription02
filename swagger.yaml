@@ -69,6 +69,18 @@ paths:
         500:
           description: Internal Server Error.
 
+ /productsDetail:
+    get:
+      summary: Get All Subscription plan from Stripe.
+      description: Get All Subscription plan from Stripe.
+      responses:
+        200:
+          description: Success.
+        500:
+          description: Failed to fetch products.
+      security:
+      - BearerAuth: []
+
  /subscribe:
   post:
     summary: Create a new subscription for a user.
@@ -104,18 +116,6 @@ paths:
         description: Error creating subscription.
     security:
     - BearerAuth: []
-
- /productsDetail:
-    get:
-      summary: Get All Subscription plan from Stripe.
-      description: Get All Subscription plan from Stripe.
-      responses:
-        200:
-          description: Success.
-        500:
-          description: Failed to fetch products.
-      security:
-      - BearerAuth: []
 
  /userDetailAndSubscriptionHistory:
     get:
