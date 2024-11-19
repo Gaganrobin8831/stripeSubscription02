@@ -4,9 +4,9 @@ info:
   title: StripeSubscriptionService
   description: A service for managing Stripe subscriptions.
 servers:
-  - url: http://localhost:2132
+- url: http://localhost:2132
 paths:
-  /register:
+ /register:
     post:
       summary: Register a new user.
       description: Register a new user.
@@ -28,11 +28,11 @@ paths:
                 contactNumber:
                   type: string
               required:
-                - fullName
-                - emailId
-                - password
-                - countryCode
-                - contactNumber
+              - fullName
+              - emailId
+              - password
+              - countryCode
+              - contactNumber
       responses:
         200:
           description: Registration successful.
@@ -41,7 +41,7 @@ paths:
         500:
           description: Internal Server Error.
 
-  /login:
+ /login:
     post:
       summary: Authenticate a user and return a token.
       description: Authenticate a user and return a token.
@@ -57,8 +57,8 @@ paths:
                 password:
                   type: string
               required:
-                - emailId
-                - password
+              - emailId
+              - password
       responses:
         200:
           description: Login success.
@@ -69,96 +69,100 @@ paths:
         500:
           description: Internal Server Error.
 
-  /subscribe:
-    post:
-      summary: Create a new subscription for a user.
-      description: Create a new subscription for a user with the specified plan and amount.
-      requestBody:
-        required: true
+ /subscribe:
+  post:
+    summary: Create a new subscription for a user.
+    description: Create a new subscription for a user with the specified productId.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+             properties:
+               productId:
+                  type: string
+                  description: Subscription productId
+            required:
+            - productId
+    responses:
+      200:
+        description: Subscription session URL.
         content:
           application/json:
             schema:
               type: object
               properties:
-                planName:
+                status:
                   type: string
-                  description: Name of the subscription plan
-                amount:
-                  type: number
-                  description: Amount for the subscription plan
-              required:
-                - planName
-                - amount
+                  example: "success"
+      400:
+        description: Missing required fields.
+      404:
+        description: Product not found or inactive.
+      500:
+        description: Error creating subscription.
+    security:
+    - BearerAuth: []
+
+ /productsDetail:
+    get:
+      summary: Get All Subscription plan from Stripe.
+      description: Get All Subscription plan from Stripe.
       responses:
         200:
-          description: Subscription session URL.
+          description: Success.
         500:
-          description: Error creating subscription.
+          description: Failed to fetch products.
       security:
-        - BearerAuth: []  # This applies Bearer token authentication to this endpoint
+      - BearerAuth: []
 
-  /updateSubscriptionTime:
-    post:
-      summary: Save subscription details to the database.
-      description: Save subscription details to the database with the provided subscriptionId.
-      responses:
-        201:
-          description: Subscription saved successfully.
-        404:
-          description: No active subscription found.
-        500:
-          description: Error saving subscription.
-      security:
-        - BearerAuth: []  # This applies Bearer token authentication to this endpoint
-
-  /userDetailAndSubscriptionHistory:
+ /userDetailAndSubscriptionHistory:
     get:
       summary: Retrieve user and subscription details and update old data status into active to inactive.
       description: Retrieve user and subscription details and update the status of old subscriptions.
       responses:
         200:
-          description: User and subscription details retrieved.
-        401:
-          description: Unauthorized.
+          description: User and Subscription Details.
+        400:
+          description: User not found.
         500:
           description: Internal Server Error.
       security:
-        - BearerAuth: []  # This applies Bearer token authentication to this endpoint
+      - BearerAuth: []
 
-  /logout:
+ /logout:
     post:
       summary: Logout the user and clear the token in the database.
       description: Logout the user and clear the token in the database.
       responses:
         200:
           description: Logout successful.
-        401:
-          description: Unauthorized.
         404:
           description: User not found.
         500:
           description: Internal Server Error.
       security:
-        - BearerAuth: []  # This applies Bearer token authentication to this endpoint
+      - BearerAuth: []
 
-  /customers:
-    get:
+ /customers:
+    post:
       summary: Upgrade and downgrade the subscription using the Stripe customer portal.
       description: Access the Stripe customer portal for managing subscription upgrades or downgrades.
       responses:
-        401:
-          description: Unauthorized.
+        200:
+          description: Success.
         500:
           description: Internal Server Error.
       security:
-        - BearerAuth: []  # This applies Bearer token authentication to this endpoint
+      - BearerAuth: []
 
-components:
+ components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT  # Optional: indicates that the format is JWT (JSON Web Token)
+      bearerFormat: JWT # Optional: indicates that the format is JWT (JSON Web Token)
 
   schemas:
     User:

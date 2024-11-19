@@ -3,19 +3,19 @@ const express = require('express');
 const { handleRegister, handleLogin, handleGetDetail, handleLogout ,handleCustomerUpgrade} = require('../controller/user.controller');
 const { checkAuth } = require('../middleware/auth.middleware');
 
-const userrouter = express.Router();
+const userRouter = express.Router();
 
 
 
-userrouter.route('/register').post(handleRegister)
+userRouter.route('/register').post(handleRegister)
 
 
-userrouter.route('/login').post(handleLogin);
-userrouter.route('/logout').post(handleLogout);
+userRouter.route('/login').post(handleLogin);
+userRouter.route('/logout').post(handleLogout);
 
-userrouter.route('/userDetailAndSubscriptionHistory').get(checkAuth, handleGetDetail)
+userRouter.route('/userDetailAndSubscriptionHistory').get(checkAuth, handleGetDetail)
 
-userrouter.route('/customers').get(handleCustomerUpgrade)
+userRouter.route('/customers').post(checkAuth,handleCustomerUpgrade)
 
 
-module.exports = userrouter;
+module.exports = userRouter;

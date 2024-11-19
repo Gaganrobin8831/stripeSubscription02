@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const connectDB = require('./src/DB/database.DB')
-const userrouter = require('./src/routes/user.routes')
+const userRouter = require('./src/routes/user.routes')
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('yamljs');
 
@@ -30,7 +30,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-app.use('/', userrouter)
+app.use('/', userRouter)
 app.use('/', subsciptionRouter)
 
 app.get('/', (req, res) => {
