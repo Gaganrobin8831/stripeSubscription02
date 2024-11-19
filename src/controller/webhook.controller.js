@@ -4,7 +4,6 @@ const subscriptionModel = require('../models/subscription.model');
 async function handleWebhook(req, res) {
     const sig = req.headers['stripe-signature'];
     const rawBody = req.body;
- 
     try {
         const event = stripe.webhooks.constructEvent(
             rawBody,
@@ -15,27 +14,13 @@ async function handleWebhook(req, res) {
         console.log('Received event:', event.type);
 
         switch (event.type) {
-            case 'checkout.session.completed':
-                console.log('New Subscription started!');
-                //   console.log(event.data);
-                break;
-
-            case 'invoice.paid':
-                console.log('Invoice paid');
-              
-                break;
-
             case 'invoice.payment_failed':
-                console.log('Invoice payment failed!');
-                // console.log(event.data);
+                // console.log('Invoice payment failed!');
                 break;
 
             case 'customer.subscription.updated':
-                console.log('Subscription updated!');
-                // console.log(event.data);
                 const updatedSubscription = event.data.object;
-
-               customerId = updatedSubscription.customer;
+                customerId = updatedSubscription.customer;
                 const productId = updatedSubscription.items.data[0].plan.product;
                 const planId = updatedSubscription.items.data[0].plan.id;
                 const amount = updatedSubscription.items.data[0].plan.amount / 100;
@@ -46,18 +31,13 @@ async function handleWebhook(req, res) {
                 const intervalCount = updatedSubscription.items.data[0].plan.interval_count;
                 const currency = updatedSubscription.currency;
                 // const planName = updatedSubscription.items.data[0].plan.nickname;
-                
-
-                
                 const product = await stripe.products.retrieve(productId);
-                const planName = product.name; 
+                const planName = product.name;
 
-                
                 const activeSubscriptions = await subscriptionModel.find({ customerId, status: 'active' });
 
                 let isSamePlan = false;
-                
-                
+
                 for (const activeSubscription of activeSubscriptions) {
                     if (
                         activeSubscription.productId === productId &&
@@ -72,21 +52,20 @@ async function handleWebhook(req, res) {
                         break;
                     }
                 }
-                
+
                 if (!isSamePlan) {
-                    
+
                     console.log('Marking old active subscriptions as inactive...');
                     await subscriptionModel.updateMany(
                         { customerId, status: 'active' },
                         {
                             $set: {
                                 status: 'inactive',
-                                endDate: new Date() 
+                                endDate: new Date()
                             }
                         }
                     );
-                
-                    
+
                     console.log('Saving new active subscription...');
                     const newSubscription = new subscriptionModel({
                         customerId,
@@ -103,18 +82,15 @@ async function handleWebhook(req, res) {
                         createdAt: new Date(),
                         updatedAt: new Date()
                     });
-                
+
                     await newSubscription.save();
                     console.log('New subscription saved successfully.');
-                } 
+                }
                 break;
 
             default:
                 console.log(`Unhandled event type: ${event.type}`);
         }
-
-
-
         res.status(200).send('Webhook received');
     } catch (err) {
         console.log(`Error verifying webhook signature: ${err.message}`);

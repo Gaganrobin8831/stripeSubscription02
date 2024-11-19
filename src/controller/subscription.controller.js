@@ -9,22 +9,12 @@ async function handleCreateSubscription(req, res) {
     const customerId = req.user?.customerId;
 
     if (!productId || !customerId) {
-        return res.status(400).json({
-            status: "fail",
-            message: "Missing required fields",
-            error: "validationError"
-        });
+        return validationErrorResponse(res, [], "Missing required fields", 400)
     }
-
     try {
-
         const product = await stripe.products.retrieve(productId);
         if (!product || !product.active) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Product not found or inactive",
-                error: "productNotFound"
-            });
+            return validationErrorResponse(res, [], "Product not found or inactive", 400)
         }
 
 
@@ -32,13 +22,8 @@ async function handleCreateSubscription(req, res) {
         const activePrice = prices.data.find(p => p.recurring?.interval === 'month' && p.active);
 
         if (!activePrice) {
-            return res.status(404).json({
-                status: "fail",
-                message: "No active price found for the product",
-                error: "priceNotFound"
-            });
+            return validationErrorResponse(res, [], "No active price found for the product", 404)
         }
-
 
         const session = await stripe.checkout.sessions.create({
             mode: 'subscription',
@@ -69,9 +54,7 @@ async function handleProductsData(req, res) {
 
         const plans = await Promise.all(products.data.filter((product) => product.active === true && product.default_price).map(async (product) => {
             try {
-
                 const price = await stripe.prices.retrieve(product.default_price);
-
                 return {
                     productId: product.id,
                     title: product.name,
@@ -85,11 +68,7 @@ async function handleProductsData(req, res) {
                 return null;
             }
         }));
-
-
         const validPlans = plans.filter(plan => plan !== null);
-
-
         console.log("Valid Plans:", validPlans);
 
         res.json({ plans: validPlans });

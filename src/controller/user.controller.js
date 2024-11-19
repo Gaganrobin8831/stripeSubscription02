@@ -3,12 +3,8 @@ const bcrypt = require('bcrypt')
 const subscriptionModel = require('../models/subscription.model');
 const { createTokenUser } = require('../middleware/validate.middleware');
 const { validationErrorResponse, successResponse } = require('../utility/response.utility');
-const jwt = require('jsonwebtoken')
-
 const validator = require('validator');
-
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-
 
 function isValidEmail(email) {
     return validator.isEmail(email);
@@ -16,24 +12,19 @@ function isValidEmail(email) {
 
 async function handleRegister(req, res) {
     const { fullName, emailId, password, countryCode, contactNumber } = req.body;
-
-    
-
     try {
-      
+
         if (!isValidEmail(emailId)) {
             return validationErrorResponse(res, [], "Enter a valid email", 409);
         }
 
-        
         if (!fullName || !emailId || !password || !countryCode || !contactNumber) {
             return validationErrorResponse(res, [], "Enter fullName, email Id, password, and role", 409);
         }
 
-       
         const existingUser = await User.findOne({ email: emailId });
         if (existingUser) {
-           
+
             if (existingUser.custmorStripeId) {
                 return validationErrorResponse(res, "error", "User already registered with a Stripe account", 409);
             } else {
@@ -42,11 +33,8 @@ async function handleRegister(req, res) {
                 return validationErrorResponse(res, error, message, 409);
             }
         }
-
-        
         const hashedPassword = await bcrypt.hash(password, 10);
 
-       
         const newUser = new User({
             fullName: fullName,
             email: emailId,
@@ -55,7 +43,6 @@ async function handleRegister(req, res) {
             countryCode
         });
 
-        
         const stripeCustomer = await stripe.customers.create({
             email: emailId,
             name: fullName,
@@ -64,12 +51,10 @@ async function handleRegister(req, res) {
         newUser.custmorStripeId = stripeCustomer.id;
         await newUser.save();
 
-
-        // return res.status(200).json({ message: "Registration successful" });
-        successResponse(res,[],"Registration successful",200)
+        successResponse(res, [], "Registration successful", 200)
 
     } catch (error) {
-        console.error("Error during registration:", error);
+        // console.error("Error during registration:", error);
         return validationErrorResponse(res, error, 'Internal Server Error', 500);
     }
 }
@@ -96,31 +81,25 @@ async function handleLogin(req, res) {
             return validationErrorResponse(res, error, 'Invalid email or password', 400)
         }
 
-
         token = createTokenUser(user);
-
-
-        
         user.token = token;
         await user.save();
 
         res.cookie('authToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
         let data = {
             emailId,
-
             token
         }
 
         return successResponse(res, data, "Login Success", 200)
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         return validationErrorResponse(res, error, 'Internal Server Error', 500);
     }
 }
 
-
 async function handleGetDetail(req, res) {
-    
+
     try {
         const { _id, customerId, name, email } = req.user;
 
@@ -138,8 +117,6 @@ async function handleGetDetail(req, res) {
         let messageForNull;
         if (subscriptions.data.length === 0) {
             messageForNull = "No active subscription found";
-
-
             const responseData = {
                 fullName: name,
                 emailId: email,
@@ -190,16 +167,15 @@ async function handleGetDetail(req, res) {
         return successResponse(res, responseData, "User and Subscription Details", 200);
 
     } catch (error) {
-        console.error("Error retrieving subscription details:", error);
+        // console.error("Error retrieving subscription details:", error);
         return validationErrorResponse(res, "error", "Failed to retrieve subscription details", 500);
     }
 }
 
-
 async function handleLogout(req, res) {
     try {
-      
-        const { _id} = req.user;
+
+        const { _id } = req.user;
         const user = await User.findById(_id);
 
         if (!user) {
@@ -210,23 +186,22 @@ async function handleLogout(req, res) {
         await user.save();
         return successResponse(res, {}, "Logout successful", 200);
     } catch (error) {
-        console.error('Logout Error:', error);
+        // console.error('Logout Error:', error);
         return validationErrorResponse(res, error, 'Internal Server Error', 500);
     }
 }
 
 async function handleCustomerUpgrade(req, res) {
     try {
-        
-        const {customerId } = req.user;
+        const { customerId } = req.user;
         const portalSession = await stripe.billingPortal.sessions.create({
             customer: customerId,
             return_url: `${process.env.BASE_URL}/`
         })
         // res.send(portalSession.url)
-        successResponse(res,portalSession.url,"Success",200)
+        successResponse(res, portalSession.url, "Success", 200)
     } catch (error) {
-       console.error(error);
+        // console.error(error);
         return validationErrorResponse(res, error, 'Internal Server Error', 500);
     }
 }
