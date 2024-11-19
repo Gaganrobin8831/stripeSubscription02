@@ -41,19 +41,19 @@ npm install
 ```
 ## Set up the environment variables:
 ```
-BASE_URL
+STRIPE_WEBHOOK_SECRET_KEY: **stripe webhook key**
 
-STRIPE_SECRET_KEY
+BASE_URL : **frontend url**
 
-SESSION_SECRET
+STRIPE_SECRET_KEY: **stripe secret key from stripe**
 
 PORT = 2132
 
-MONGO_URI
+MONGO_URI : **MongoDb compaas or atls connection string**
 
-DB_NAME
+DB_NAME : **Any Name**
 
-secret
+secret : **Any secret for token create and verify**
 ```
 ------------------------------------------------------------------------------------------------------
 ## Start the application:
