@@ -11,6 +11,7 @@ const swaggerDocument = yaml.load('./swagger.yaml');
 const cors = require('cors')
 const { subsciptionRouter } = require('./src/routes/subscription.routes')
 const { handleWebhook } = require('./src/controller/webhook.controller')
+const { errorResponse } = require('./src/utility/response.utility')
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -45,5 +46,6 @@ connectDB()
         })
     })
     .catch((err) => {
-        console.log(err);
+        // console.log(err);
+        return errorResponse(res,[err.message],'Internal Server Error',500)
     })

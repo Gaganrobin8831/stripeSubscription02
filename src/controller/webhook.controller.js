@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const subscriptionModel = require('../models/subscription.model');
+const { errorResponse } = require('../utility/response.utility');
 
 async function handleWebhook(req, res) {
     const sig = req.headers['stripe-signature'];
@@ -11,7 +12,7 @@ async function handleWebhook(req, res) {
             process.env.STRIPE_WEBHOOK_SECRET_KEY
         );
 
-        console.log('Received event:', event.type);
+        // console.log('Received event:', event.type);
 
         switch (event.type) {
             case 'invoice.payment_failed':
@@ -47,7 +48,7 @@ async function handleWebhook(req, res) {
                         activeSubscription.interval === interval &&
                         activeSubscription.intervalCount === intervalCount
                     ) {
-                        console.log('Matching active subscription found in DB. No action needed.');
+                        // console.log('Matching active subscription found in DB. No action needed.');
                         isSamePlan = true;
                         break;
                     }
@@ -55,7 +56,7 @@ async function handleWebhook(req, res) {
 
                 if (!isSamePlan) {
 
-                    console.log('Marking old active subscriptions as inactive...');
+                    // console.log('Marking old active subscriptions as inactive...');
                     await subscriptionModel.updateMany(
                         { customerId, status: 'active' },
                         {
@@ -66,7 +67,7 @@ async function handleWebhook(req, res) {
                         }
                     );
 
-                    console.log('Saving new active subscription...');
+                    // console.log('Saving new active subscription...');
                     const newSubscription = new subscriptionModel({
                         customerId,
                         productId,
@@ -84,17 +85,17 @@ async function handleWebhook(req, res) {
                     });
 
                     await newSubscription.save();
-                    console.log('New subscription saved successfully.');
+                    // console.log('New subscription saved successfully.');
                 }
                 break;
 
-            default:
-                console.log(`Unhandled event type: ${event.type}`);
+            // default:
+                // console.log(`Unhandled event type: ${event.type}`);
         }
         res.status(200).send('Webhook received');
     } catch (err) {
-        console.log(`Error verifying webhook signature: ${err.message}`);
-        res.status(400).send(`Webhook Error: ${err.message}`);
+        // console.log(`Error verifying webhook signature: ${err.message}`);
+        return errorResponse(res,[err.message],'Webhook Error',500)
     }
 }
 
