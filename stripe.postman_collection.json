@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"fullName\":\"test\",\r\n    \"emailId\":\"test@gmail.com\",\r\n    \"password\":\"test@123\",\r\n    \"countryCode\":\"+91\",\r\n    \"contactNumber\":\"123456789\"\r\n}",
+					"raw": "{\r\n    \"fullName\":\"test1\",\r\n    \"emailId\":\"test1@gmail.com\",\r\n    \"password\":\"test1@123\",\r\n    \"countryCode\":\"+91\",\r\n    \"contactNumber\":\"545254757\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -21,14 +21,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2132/regester",
+					"raw": "http://localhost:2132/register",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "2132",
 					"path": [
-						"regester"
+						"register"
 					]
 				}
 			},
@@ -41,7 +41,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"emailId\":\"tester21@gmail.com\",\r\n    \"password\":\"test@123\"\r\n}",
+					"raw": "{\r\n    \"emailId\":\"test1@gmail.com\",\r\n    \"password\":\"test1@123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -70,7 +70,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM1ZGU3ODA5YTc3MDFiOWFmMzFjNTIiLCJlbWFpbCI6InRlc3RlcjIxQGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0ZXIiLCJjdXN0b21lcklkIjoiY3VzX1JEUzZzRGloSWpBZzVMIiwiaWF0IjoxNzMxNTg0MTQzLCJleHAiOjE3MzE2NzA1NDN9.ji3Lc2LOp9QSNHAkPlh9gNa5qbaasDWUyltYxmmWbYc",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzNjMTVkMTlhMzlkNDA0YTdlMjY3YWMiLCJlbWFpbCI6InRlc3QxQGdtYWlsLmNvbSIsIm5hbWUiOiJ0ZXN0MSIsImN1c3RvbWVySWQiOiJjdXNfUkZEYzdYTGdSTkRsT2QiLCJpYXQiOjE3MzE5OTA5OTgsImV4cCI6MTczMjA3NzM5OH0._EBeVbYVKXdV-26AHci6Pa-HuFeujDXZUllzRkA_u1o",
 							"type": "string"
 						}
 					]
@@ -99,7 +99,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM1YTU1YTMyYjIzZjcwNmY1NWZlZWYiLCJlbWFpbCI6Imxha3NoYXlAZ21haWwuY29tIiwibmFtZSI6Imxha3NoYXkiLCJjdXN0b21lcklkIjoiY3VzX1JET0FyVm1GelJoY212IiwiaWF0IjoxNzMxNTY5NTAzLCJleHAiOjE3MzE2NTU5MDN9.CQO6EilieJBEMHEdCF3FnaR42cnnRs9Z2V6jXNdkvtk",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzNjMTVkMTlhMzlkNDA0YTdlMjY3YWMiLCJlbWFpbCI6InRlc3QxQGdtYWlsLmNvbSIsIm5hbWUiOiJ0ZXN0MSIsImN1c3RvbWVySWQiOiJjdXNfUkZEYzdYTGdSTkRsT2QiLCJpYXQiOjE3MzE5OTA5OTgsImV4cCI6MTczMjA3NzM5OH0._EBeVbYVKXdV-26AHci6Pa-HuFeujDXZUllzRkA_u1o",
 							"type": "string"
 						}
 					]
@@ -108,7 +108,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"planName\":\"Starter\",\r\n    \"amount\":\"29\"\r\n}",
+					"raw": "{\r\n    \"productId\":\"prod_RCJ8x4xZUmJcVY\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -137,12 +137,12 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzMzM2YzZjdiNTFkNzk2YmQ4NTc0MTIiLCJlbWFpbCI6Inl1dmlAZ21haWwuc28iLCJuYW1lIjoiWXV2cmFqIFNpbmdoIiwiY3VzdG9tZXJJZCI6ImN1c19SQ2h1ZG5JUmw1eXp0VSIsImlhdCI6MTczMTQ3NzM2NywiZXhwIjoxNzMxNTYzNzY3fQ.jZ2OUx1qGa1yoWGMRuFFw9VJX9V754eHZyv5GSZx3Co",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzNjMWRjM2JlYjM3OTllNDczNjI5MzAiLCJlbWFpbCI6InRlc3QxQGdtYWlsLmNvbSIsIm5hbWUiOiJ0ZXN0MSIsImN1c3RvbWVySWQiOiJjdXNfUkZFQXRGS2FXNVZ2aWciLCJpYXQiOjE3MzE5OTMwMzEsImV4cCI6MTczMjA3OTQzMX0.kk6MdtgMco32pu7Eh3SkXzNGyVbPg9hQQI70b9RGZtw",
 							"type": "string"
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"url": {
 					"raw": "http://localhost:2132/customers",
@@ -182,6 +182,25 @@
 					"port": "2132",
 					"path": [
 						"UpdateSubscriptionTime"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "productsDetail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2132/productsDetail",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2132",
+					"path": [
+						"productsDetail"
 					]
 				}
 			},
