@@ -12,7 +12,7 @@ const validateLogin = async (req, res, next) => {
 
     for (const [key, value] of Object.entries(requiredFields)) {
         if (!value) {
-            return validationErrorResponse(res, [], `Enter ${key}.`, 409);
+            return validationErrorResponse(res, [], `${key} is required.`, 409);
         }
     }
 
