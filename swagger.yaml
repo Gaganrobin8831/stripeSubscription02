@@ -82,40 +82,40 @@ paths:
       - BearerAuth: []
 
  /subscribe:
-  post:
-    summary: Create a new subscription for a user.
-    description: Create a new subscription for a user with the specified productId.
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-             properties:
-               productId:
-                  type: string
-                  description: Subscription productId
-            required:
-            - productId
-    responses:
-      200:
-        description: Subscription session URL.
+    post:
+      summary: Create a new subscription for a user.
+      description: Create a new subscription for a user with the specified productId.
+      requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                status:
-                  type: string
-                  example: "success"
-      400:
-        description: Missing required fields.
-      404:
-        description: Product not found or inactive.
-      500:
-        description: Error creating subscription.
-    security:
-    - BearerAuth: []
+                productId:
+                    type: string
+                    description: Subscription productId
+              required:
+              - productId
+      responses:
+        200:
+          description: Subscription session URL.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+        400:
+          description: Missing required fields.
+        404:
+          description: Product not found or inactive.
+        500:
+          description: Error creating subscription.
+      security:
+      - BearerAuth: []
 
  /userDetailAndSubscriptionHistory:
     get:

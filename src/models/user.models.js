@@ -22,10 +22,10 @@ const userSchema = new mongoose.Schema({
   token:{
     type:String
   },
-  contactNumber:{
+  countryCode:{
     type:String
   },
-  countryCode:{
+   contactNumber:{
     type:String
   }
 },{timestamps:true});
