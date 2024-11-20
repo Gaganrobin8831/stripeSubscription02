@@ -13,7 +13,7 @@ userRouter.route('/register').post(validateRegistration,handleRegister)
 
 
 userRouter.route('/login').post(validateLogin,handleLogin);
-userRouter.route('/logout').post(handleLogout);
+userRouter.route('/logout').post(checkAuth,handleLogout);
 
 userRouter.route('/userDetailAndSubscriptionHistory').get(checkAuth, handleGetDetail)
 

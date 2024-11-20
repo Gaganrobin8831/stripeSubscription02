@@ -82,7 +82,7 @@ async function handleGetDetail(req, res) {
 
     try {
         const { _id, customerId, name, email } = req.user;
-
+        
         const user = await User.findById(_id);
         if (!user) {
             return validationErrorResponse(res, "error", "User not found", 400);
