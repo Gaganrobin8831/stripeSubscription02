@@ -4,9 +4,9 @@ info:
   title: StripeSubscriptionService
   description: A service for managing Stripe subscriptions.
 servers:
-- url: http://localhost:2132
+  - url: http://localhost:2132
 paths:
- /register:
+  /register:
     post:
       summary: Register a new user.
       description: Register a new user.
@@ -28,11 +28,11 @@ paths:
                 contactNumber:
                   type: string
               required:
-              - fullName
-              - emailId
-              - password
-              - countryCode
-              - contactNumber
+                - fullName
+                - emailId
+                - password
+                - countryCode
+                - contactNumber
       responses:
         200:
           description: Registration successful.
@@ -41,7 +41,7 @@ paths:
         500:
           description: Internal Server Error.
 
- /login:
+  /login:
     post:
       summary: Authenticate a user and return a token.
       description: Authenticate a user and return a token.
@@ -57,8 +57,8 @@ paths:
                 password:
                   type: string
               required:
-              - emailId
-              - password
+                - emailId
+                - password
       responses:
         200:
           description: Login success.
@@ -69,19 +69,19 @@ paths:
         500:
           description: Internal Server Error.
 
- /productsDetail:
+  /productsDetail:
     get:
-      summary: Get All Subscription plan from Stripe.
-      description: Get All Subscription plan from Stripe.
+      summary: Get All Subscription plans from Stripe.
+      description: Get All Subscription plans from Stripe.
       responses:
         200:
           description: Success.
         500:
           description: Failed to fetch products.
       security:
-      - BearerAuth: []
+        - BearerAuth: []
 
- /subscribe:
+  /subscribe:
     post:
       summary: Create a new subscription for a user.
       description: Create a new subscription for a user with the specified productId.
@@ -93,10 +93,10 @@ paths:
               type: object
               properties:
                 productId:
-                    type: string
-                    description: Subscription productId
+                  type: string
+                  description: Subscription productId
               required:
-              - productId
+                - productId
       responses:
         200:
           description: Subscription session URL.
@@ -115,9 +115,9 @@ paths:
         500:
           description: Error creating subscription.
       security:
-      - BearerAuth: []
+        - BearerAuth: []
 
- /userDetailAndSubscriptionHistory:
+  /userDetailAndSubscriptionHistory:
     get:
       summary: Retrieve user and subscription details and update old data status into active to inactive.
       description: Retrieve user and subscription details and update the status of old subscriptions.
@@ -129,9 +129,9 @@ paths:
         500:
           description: Internal Server Error.
       security:
-      - BearerAuth: []
+        - BearerAuth: []
 
- /logout:
+  /logout:
     post:
       summary: Logout the user and clear the token in the database.
       description: Logout the user and clear the token in the database.
@@ -143,9 +143,9 @@ paths:
         500:
           description: Internal Server Error.
       security:
-      - BearerAuth: []
+        - BearerAuth: []
 
- /customers:
+  /customers:
     post:
       summary: Upgrade and downgrade the subscription using the Stripe customer portal.
       description: Access the Stripe customer portal for managing subscription upgrades or downgrades.
@@ -155,14 +155,14 @@ paths:
         500:
           description: Internal Server Error.
       security:
-      - BearerAuth: []
+        - BearerAuth: []
 
- components:
+components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT # Optional: indicates that the format is JWT (JSON Web Token)
+      bearerFormat: JWT
 
   schemas:
     User:

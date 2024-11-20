@@ -8,10 +8,12 @@ const yaml = require('yamljs');
 
 const cookieParser = require('cookie-parser')
 const swaggerDocument = yaml.load('./swagger.yaml');
+
 const cors = require('cors')
 const { subsciptionRouter } = require('./src/routes/subscription.routes')
 const { handleWebhook } = require('./src/controller/webhook.controller')
 const { errorResponse } = require('./src/utility/response.utility')
+
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
