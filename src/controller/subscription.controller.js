@@ -8,6 +8,9 @@ async function handleCreateSubscription(req, res) {
     const { productId } = req.body;
     const customerId = req.user?.customerId;
     productId.split(':')[0]
+
+    console.log(customerId,productId);
+    
     if (!productId || !customerId) {
         return validationErrorResponse(res, [], "Missing required fields", 400)
     }
