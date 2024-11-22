@@ -7,7 +7,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 async function handleCreateSubscription(req, res) {
     const { productId } = req.body;
     const customerId = req.user?.customerId;
-
+    productId.split(':')[0]
     if (!productId || !customerId) {
         return validationErrorResponse(res, [], "Missing required fields", 400)
     }
