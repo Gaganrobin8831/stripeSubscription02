@@ -65,7 +65,7 @@ async function handleProductsData(req, res) {
         const validPlans = plans.filter(plan => plan !== null);
         // console.log("Valid Plans:", validPlans);
 
-        res.json({ plans: validPlans });
+        // res.json({ plans: validPlans });
         successResponse(res, validPlans, "Success", 200)
 
     } catch (error) {
