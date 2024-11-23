@@ -1,4 +1,4 @@
-# StripeSubscriptionService API
+# Stripe Subscription And One Time Payment
 
 
 ## Overview
