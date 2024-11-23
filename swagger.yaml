@@ -157,6 +157,36 @@ paths:
       security:
         - BearerAuth: []
 
+  /payment:
+    post:
+      summary: create one time payment.
+      description: One time payment for any product.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  description: The amount that was processed.
+                productName:
+                  type: string
+                  description: The name of the product that was purchased.
+              required:
+                - amount
+                - productName
+      responses:
+        200:
+          description: Payment processed and saved successfully.
+        400:
+          description: Missing or invalid payment details.
+        500:
+          description: Error processing payment.
+      security:
+        - BearerAuth: []
+
 components:
   securitySchemes:
     BearerAuth:
@@ -222,5 +252,26 @@ components:
           type: string
           format: date-time
         updatedAt:
+          type: string
+          format: date-time
+
+    Payment:
+      type: object
+      properties:
+        customerId:
+          type: string
+        sessionId:
+          type: string
+        paymentIntentId:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        paymentStatus:
+          type: string
+        productName:
+          type: string
+        createdAt:
           type: string
           format: date-time
