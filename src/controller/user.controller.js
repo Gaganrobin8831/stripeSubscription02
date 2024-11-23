@@ -113,7 +113,6 @@ async function handleGetDetail(req, res) {
                     planName: pay.productName,
                     amount: pay.amount / 100,
                     currency: pay.currency,
-                    status: pay.paymentStatus,
                     paymentDate : pay.createdAt.toISOString()        
                 }))
             };
@@ -162,7 +161,6 @@ async function handleGetDetail(req, res) {
                 planName: pay.productName,
                 amount: pay.amount / 100,
                 currency: pay.currency,
-                status: pay.paymentStatus,
                 paymentDate : pay.createdAt.toISOString()        
             }))
 
