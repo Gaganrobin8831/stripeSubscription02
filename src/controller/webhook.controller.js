@@ -1,10 +1,12 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const subscriptionModel = require('../models/subscription.model');
 const { errorResponse } = require('../utility/response.utility');
-const Payment = require('../models/payment.model')
+const Payment = require('../models/payment.model');
+
 async function handleWebhook(req, res) {
     const sig = req.headers['stripe-signature'];
     const rawBody = req.body;
+
     try {
         const event = stripe.webhooks.constructEvent(
             rawBody,
@@ -12,16 +14,13 @@ async function handleWebhook(req, res) {
             process.env.STRIPE_WEBHOOK_SECRET_KEY
         );
 
-        // console.log('Received event:', event.type);
-
         switch (event.type) {
             case 'invoice.payment_failed':
-                // console.log('Invoice payment failed!');
                 break;
 
             case 'customer.subscription.updated':
                 const updatedSubscription = event.data.object;
-                customerId = updatedSubscription.customer;
+                const customerId = updatedSubscription.customer;
                 const productId = updatedSubscription.items.data[0].plan.product;
                 const planId = updatedSubscription.items.data[0].plan.id;
                 const amount = updatedSubscription.items.data[0].plan.amount / 100;
@@ -31,7 +30,6 @@ async function handleWebhook(req, res) {
                 const interval = updatedSubscription.items.data[0].plan.interval;
                 const intervalCount = updatedSubscription.items.data[0].plan.interval_count;
                 const currency = updatedSubscription.currency;
-                // const planName = updatedSubscription.items.data[0].plan.nickname;
                 const product = await stripe.products.retrieve(productId);
                 const planName = product.name;
 
@@ -48,15 +46,12 @@ async function handleWebhook(req, res) {
                         activeSubscription.interval === interval &&
                         activeSubscription.intervalCount === intervalCount
                     ) {
-                        // console.log('Matching active subscription found in DB. No action needed.');
                         isSamePlan = true;
                         break;
                     }
                 }
 
                 if (!isSamePlan) {
-
-                    // console.log('Marking old active subscriptions as inactive...');
                     await subscriptionModel.updateMany(
                         { customerId, status: 'active' },
                         {
@@ -67,7 +62,6 @@ async function handleWebhook(req, res) {
                         }
                     );
 
-                    // console.log('Saving new active subscription...');
                     const newSubscription = new subscriptionModel({
                         customerId,
                         productId,
@@ -85,56 +79,49 @@ async function handleWebhook(req, res) {
                     });
 
                     await newSubscription.save();
-                    // console.log('New subscription saved successfully.');
                 }
                 break;
 
-
-                case 'checkout.session.completed':
-                    const session = event.data.object;
-                    // console.log('Checkout session completed:', session); 
+            case 'checkout.session.completed':
+                const session = event.data.object;
                 
-                    try {
-                       
-                        const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
-                            expand: ['data.price.product'],
-                        });
-                
-                        
-                        console.log('Line items:', lineItems.data);
-                
-                       
-                        const productName = lineItems.data[0]?.description || 'Unknown Product';
-                        
-                        
-                        const payment = new Payment({
-                            customerId: session.customer,
-                            sessionId: session.id,
-                            paymentIntentId: session.payment_intent,
-                            amount: session.amount_total,
-                            currency: session.currency,
-                            paymentStatus: session.payment_status,
-                            productName: productName,
-                        });
-                
-                        
-                        console.log('Payment object:', payment);
-                
-                        await payment.save();  
-                        console.log('Payment saved successfully:', payment);
-                    } catch (error) {
-                        console.error('Error saving payment:', error.message);
-                        return res.status(500).send('Internal Server Error');
-                    }
+              
+                if (session.subscription) {
+                  
                     break;
-                
-            // default:
-                // console.log(`Unhandled event type: ${event.type}`);
+                }
+
+                try {
+                    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+                        expand: ['data.price.product'],
+                    });
+
+                    const productName = lineItems.data[0]?.description || 'Unknown Product';
+
+                    const payment = new Payment({
+                        customerId: session.customer,
+                        sessionId: session.id,
+                        paymentIntentId: session.payment_intent,
+                        amount: session.amount_total,
+                        currency: session.currency,
+                        paymentStatus: session.payment_status,
+                        productName: productName,
+                    });
+
+                    await payment.save();
+                } catch (error) {
+                    console.error('Error saving payment:', error.message);
+                    return res.status(500).send('Internal Server Error');
+                }
+                break;
+
+            default:
+                break;
         }
+
         res.status(200).send('Webhook received');
     } catch (err) {
-        // console.log(`Error verifying webhook signature: ${err.message}`);
-        return errorResponse(res,[err.message],'Webhook Error',500)
+        return errorResponse(res, [err.message], 'Webhook Error', 500);
     }
 }
 
