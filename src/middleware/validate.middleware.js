@@ -1,6 +1,7 @@
 const JWT = require('jsonwebtoken');
 
-const secret = process.env.secret;  
+const secret = "qtert1823sdf"
+ 
 
 function createTokenUser(user) {
     const payload = {
