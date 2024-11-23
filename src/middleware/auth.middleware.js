@@ -24,7 +24,7 @@ async function checkAuth(req, res, next) {
       }
       next(); 
   } catch (error) {
-      // console.log('Invalid token:', error.message);
+      console.log('Invalid token:', error.message);
       return errorResponse(res,[error.message],"Something Wrong",500)
   }
 }

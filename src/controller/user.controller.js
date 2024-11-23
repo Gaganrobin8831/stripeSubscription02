@@ -203,8 +203,18 @@ async function handleCustomerUpgrade(req, res) {
             customer: customerId,
             return_url: `${process.env.BASE_URL}/`
         })
+
+        const subscriptions = await stripe.subscriptions.list({
+            customer: portalSession.customer,
+            status: 'active',
+            limit: 1
+        });
         // res.send(portalSession.url)
-        successResponse(res, portalSession.url, "Success", 200)
+        const subscriptionId = subscriptions.data[0]?.id;
+        const url = `${portalSession.url}/subscriptions/${subscriptionId}/update`
+        console.log(url);
+        
+        successResponse(res,url, "Success", 200)
     } catch (error) {
         // console.error(error);
         return errorResponse(res, [error.message], 'Internal Server Error', 500)
