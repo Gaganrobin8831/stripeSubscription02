@@ -111,7 +111,7 @@ async function handleGetDetail(req, res) {
                 paymentHistory: paymentHistory.map(pay => ({
                     id: pay._id,
                     planName: pay.planName,
-                    amount: pay.amount,
+                    amount: pay.amount / 100,
                     currency: pay.currency,
                     status: pay.paymentStatus,
                     paymentDate : pay.createdAt.toISOString()        
@@ -160,7 +160,7 @@ async function handleGetDetail(req, res) {
             paymentHistory: paymentHistory.map(pay => ({
                 id: pay._id,
                 planName: pay.planName,
-                amount: pay.amount,
+                amount: pay.amount / 100,
                 currency: pay.currency,
                 status: pay.paymentStatus,
                 paymentDate : pay.createdAt.toISOString()        
