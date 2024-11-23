@@ -119,8 +119,8 @@ paths:
 
   /userDetailAndSubscriptionHistory:
     get:
-      summary: Retrieve user and subscription details and update old data status into active to inactive.
-      description: Retrieve user and subscription details and update the status of old subscriptions.
+      summary: Retrieve user , user One Time Payment and subscription details and update old data status into active to inactive.
+      description: Retrieve user , user One Time Payment and subscription details and update the status of old subscriptions.
       responses:
         200:
           description: User and Subscription Details.
