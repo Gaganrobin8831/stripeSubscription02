@@ -1,7 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const subscriptionModel = require('../models/subscription.model');
 const { errorResponse } = require('../utility/response.utility');
-
+const Payment = require('../models/payment.model')
 async function handleWebhook(req, res) {
     const sig = req.headers['stripe-signature'];
     const rawBody = req.body;
@@ -89,6 +89,45 @@ async function handleWebhook(req, res) {
                 }
                 break;
 
+
+                case 'checkout.session.completed':
+                    const session = event.data.object;
+                    // console.log('Checkout session completed:', session); 
+                
+                    try {
+                       
+                        const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+                            expand: ['data.price.product'],
+                        });
+                
+                        
+                        console.log('Line items:', lineItems.data);
+                
+                       
+                        const productName = lineItems.data[0]?.description || 'Unknown Product';
+                        
+                        
+                        const payment = new Payment({
+                            customerId: session.customer,
+                            sessionId: session.id,
+                            paymentIntentId: session.payment_intent,
+                            amount: session.amount_total,
+                            currency: session.currency,
+                            paymentStatus: session.payment_status,
+                            productName: productName,
+                        });
+                
+                        
+                        console.log('Payment object:', payment);
+                
+                        await payment.save();  
+                        console.log('Payment saved successfully:', payment);
+                    } catch (error) {
+                        console.error('Error saving payment:', error.message);
+                        return res.status(500).send('Internal Server Error');
+                    }
+                    break;
+                
             // default:
                 // console.log(`Unhandled event type: ${event.type}`);
         }

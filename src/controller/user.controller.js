@@ -4,6 +4,7 @@ const subscriptionModel = require('../models/subscription.model');
 const { createTokenUser } = require('../middleware/validate.middleware');
 const { validationErrorResponse, successResponse, errorResponse } = require('../utility/response.utility');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+const Payment = require('../models/payment.model')
 
 async function handleRegister(req, res) {
     const { fullName, emailId, password, countryCode, contactNumber } = req.body;
@@ -96,6 +97,9 @@ async function handleGetDetail(req, res) {
 
         let messageForNull;
         if (subscriptions.data.length === 0) {
+
+            const paymentHistory = await Payment.find({ customerId }).sort({ createdAt: -1 });
+        
             messageForNull = "No active subscription found";
             const responseData = {
                 fullName: name,
@@ -103,7 +107,15 @@ async function handleGetDetail(req, res) {
                 contactNumber: `${user.countryCode} ${user.contactNumber}`,
                 messageForNull,
                 activePlan: [],
-                subscriptionHistory: []
+                subscriptionHistory: [],
+                paymentHistory: paymentHistory.map(pay => ({
+                    id: pay._id,
+                    planName: pay.planName,
+                    amount: pay.amount,
+                    currency: pay.currency,
+                    status: pay.paymentStatus,
+                    paymentDate : pay.createdAt.toISOString()        
+                }))
             };
 
             return successResponse(res, responseData, "User and Subscription Details", 200);
@@ -125,7 +137,10 @@ async function handleGetDetail(req, res) {
         };
 
         const subscriptionHistory = await subscriptionModel.find({ customerId }).sort({ createdAt: -1 });
-
+        const paymentHistory = await Payment.find({ customerId }).sort({ createdAt: -1 });
+        
+    
+        
         const responseData = {
             fullName: user.fullName,
             emailId: user.email,
@@ -141,7 +156,16 @@ async function handleGetDetail(req, res) {
                 status: sub.status,
                 startDate: sub.startDate.toISOString(),
                 endDate: sub.endDate ? sub.endDate.toISOString() : null
+            })),
+            paymentHistory: paymentHistory.map(pay => ({
+                id: pay._id,
+                planName: pay.planName,
+                amount: pay.amount,
+                currency: pay.currency,
+                status: pay.paymentStatus,
+                paymentDate : pay.createdAt.toISOString()        
             }))
+
         };
 
         return successResponse(res, responseData, "User and Subscription Details", 200);

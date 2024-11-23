@@ -16,7 +16,7 @@ async function checkAuth(req, res, next) {
       const {_id} = req.user
       const user = await User.findById(_id);
       
-      console.log(user)
+      // console.log(user)
       
       if (user.token === null) {
         

@@ -13,6 +13,7 @@ const cors = require('cors')
 const { subsciptionRouter } = require('./src/routes/subscription.routes')
 const { handleWebhook } = require('./src/controller/webhook.controller')
 const { errorResponse } = require('./src/utility/response.utility')
+const { paymentRouter } = require('./src/routes/payment.routes')
 
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -35,6 +36,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use('/', userRouter)
 app.use('/', subsciptionRouter)
+app.use('/', paymentRouter)
 
 app.get('/', (req, res) => {
     res.send('Welcome To Stripe But You Come Wrong Url')
