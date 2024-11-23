@@ -12,7 +12,7 @@ const {custmorId} = req.body
                     product_data: {
                         name: req.body.productName || 'Sample Product', 
                     },
-                    unit_amount: 5000,
+                    unit_amount: req.body.amount  || 5000,
                 },
                 quantity: 1,
             }],
