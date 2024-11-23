@@ -110,7 +110,7 @@ async function handleGetDetail(req, res) {
                 subscriptionHistory: [],
                 paymentHistory: paymentHistory.map(pay => ({
                     id: pay._id,
-                    planName: pay.planName,
+                    planName: pay.productName,
                     amount: pay.amount / 100,
                     currency: pay.currency,
                     status: pay.paymentStatus,
@@ -159,7 +159,7 @@ async function handleGetDetail(req, res) {
             })),
             paymentHistory: paymentHistory.map(pay => ({
                 id: pay._id,
-                planName: pay.planName,
+                planName: pay.productName,
                 amount: pay.amount / 100,
                 currency: pay.currency,
                 status: pay.paymentStatus,
