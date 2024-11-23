@@ -145,7 +145,19 @@ paths:
       security:
         - BearerAuth: []
 
-  /customers:
+  /updateSubcription:
+    post:
+      summary: Upgrade and downgrade the subscription using the Stripe customer portal.
+      description: Access the Stripe customer portal for managing subscription upgrades or downgrades.
+      responses:
+        200:
+          description: Success.
+        500:
+          description: Internal Server Error.
+      security:
+        - BearerAuth: []
+
+  /manageSubscription:
     post:
       summary: Upgrade and downgrade the subscription using the Stripe customer portal.
       description: Access the Stripe customer portal for managing subscription upgrades or downgrades.

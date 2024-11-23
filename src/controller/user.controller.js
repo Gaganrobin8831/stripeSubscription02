@@ -219,11 +219,29 @@ async function handleCustomerUpgrade(req, res) {
     }
 }
 
+async function handleCustomerManageSubscription(req, res) {
+    try {
+        const { customerId } = req.user;
+        const portalSession = await stripe.billingPortal.sessions.create({
+            customer: customerId,
+            return_url: `${process.env.BASE_URL}/`
+        })
+
+      
+        
+        successResponse(res,portalSession.url, "Success", 200)
+    } catch (error) {
+        // console.error(error);
+        return errorResponse(res, [error.message], 'Internal Server Error', 500)
+    }
+}
+
 module.exports = {
     handleRegister,
     handleLogin,
     handleGetDetail,
     handleLogout,
-    handleCustomerUpgrade
+    handleCustomerUpgrade,
+    handleCustomerManageSubscription
 
 }
