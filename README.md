@@ -2,7 +2,7 @@
 
 
 ## Overview
-The StripeSubscriptionService is an API for managing Stripe subscriptions. It provides endpoints for user registration, login, subscription creation, user detail retrieval, and managing subscriptions via the Stripe customer portal. This service uses Bearer token authentication for secure access to certain endpoints.
+The StripeSubscriptionService is an API for managing Stripe subscriptions. It provides endpoints for user registration, login, subscription creation, user detail retrieval, and managing subscriptions via the Stripe customer portal. This service uses Bearer token authentication for secure access to certain endpoints. And also One Time payment with Stripe
 
 Base URL
 The base URL for the API is:   http://localhost:2132/
@@ -10,7 +10,8 @@ The base URL for the API is:   http://localhost:2132/
 
 ## Features
 Create: Create customer and the Subscription using routes
-Read: View the full Detail of the user Subscription
+Create: Create One Time Payment
+Read: View the full Detail of the user Subscription And The Payment History
 Update: Upgrate and Downgrade the user subscription
 
 ## Prerequisites
