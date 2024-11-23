@@ -172,7 +172,7 @@ async function handleGetDetail(req, res) {
 
     } catch (error) {
         // console.error("Error retrieving subscription details:", error);
-        return errorResponse(res, [error.message], "Failed to retrieve subscription details", 500);
+        return errorResponse(res, [error.message], "Failed to retrieve subscription details ANd payment Detail And User Detail", 500);
     }
 }
 

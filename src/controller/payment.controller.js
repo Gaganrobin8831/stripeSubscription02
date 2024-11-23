@@ -1,7 +1,10 @@
+const { successResponse, errorResponse } = require('../utility/response.utility');
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const createcheckOutsession = async (req, res) => {
 const {custmorId} = req.user
+const { productName,amount} = req.body
     try {
      
         const session = await stripe.checkout.sessions.create({
@@ -10,21 +13,22 @@ const {custmorId} = req.user
                 price_data: {
                     currency: 'usd',
                     product_data: {
-                        name: req.body.productName || 'Sample Product', 
+                        name: productName || 'Sample Product', 
                     },
-                    unit_amount: req.body.amount  || 5000,
+                    unit_amount: amount * 100  || 5000,
                 },
                 quantity: 1,
             }],
             mode: 'payment',
             payment_method_types: ['card'],
-            success_url: 'http://localhost:3000/success.html?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url: 'http://localhost:3000/cancel.html',
+            success_url: `https://subscription-5k7x.onrender.com/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://subscription-5k7x.onrender.com/payment-failed`,
         });
-        // Send the session ID for testing in Postman
-        res.status(200).send({ sessionId: session.id, url: session.url });
+        
+        return successResponse(res, session.url, "Success", 200);
     } catch (error) {
-        res.status(400).send({ success: false, msg: error.message });
+        
+        return errorResponse(res, [error.message], "Internal Server Error", 500);
     }
 };
 
