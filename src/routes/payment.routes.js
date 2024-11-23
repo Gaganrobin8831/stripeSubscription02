@@ -6,7 +6,7 @@ const { createcheckOutsession } = require('../controller/payment.controller');
 
 
 
-paymentRouter.route('/payment').post(createcheckOutsession)
+paymentRouter.route('/payment').post(checkAuth,createcheckOutsession)
 
 
 

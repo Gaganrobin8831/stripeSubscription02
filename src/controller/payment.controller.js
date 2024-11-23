@@ -1,7 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const createcheckOutsession = async (req, res) => {
-const {custmorId} = req.body
+const {custmorId} = req.user
     try {
      
         const session = await stripe.checkout.sessions.create({
