@@ -3,12 +3,12 @@ const { successResponse, errorResponse } = require('../utility/response.utility'
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const createcheckOutsession = async (req, res) => {
-const {custmorId} = req.user
+const {customerId} = req.user
 const { productName,amount} = req.body
     try {
-     
+     console.log(customerId)
         const session = await stripe.checkout.sessions.create({
-            customer: custmorId,
+            customer: customerId,
             line_items: [{
                 price_data: {
                     currency: 'usd',
