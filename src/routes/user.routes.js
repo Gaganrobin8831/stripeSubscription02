@@ -17,7 +17,7 @@ userRouter.route('/logout').post(checkAuth,handleLogout);
 
 userRouter.route('/userDetailAndSubscriptionHistory').get(checkAuth, handleGetDetail)
 
-userRouter.route('/updateSubcription').post(checkAuth,handleCustomerUpgrade)
+userRouter.route('/updateSubscription').post(checkAuth,handleCustomerUpgrade)
 userRouter.route('/manageSubscription').post(checkAuth,handleCustomerManageSubscription)
 
 
